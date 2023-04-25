@@ -1,8 +1,10 @@
+source("data.R")
+
 # when the user clicks the button to load the data...
 loaded_data <- observeEvent(input$load_results,{
   # the data will load from dropbox (with a message explaining what's happening)
   showModal(modalDialog("Loading data"))
-  loaded_data <- import_data_dropbox()
+  loaded_data <- import_data_dropbox(global_data)
 
   # And the rest of the input options will be updated based on the data
   updateRadioButtons(session, "exp_class",

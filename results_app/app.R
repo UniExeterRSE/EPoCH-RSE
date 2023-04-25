@@ -6,9 +6,15 @@ library(plotly)
 library(shinycssloaders)
 library(shinyjs)
 library(shinyTree)
+library(bslib)
 
+source("data.R")
+source("plot.R")
+
+# Hard coded choices for comparisons
 exposures <- list("Any", "Smoking", "Alcohol consumption", "Caffeine consumption", "Socioeconomic position", "Physical activity", "Diet")
 outcomes <- list("Any", "Perinatal survival", "Immunological", "Body size and composition", "Psychosocial and cognitive", "Serum biomarkers", "Negative control outcomes", "Blood pressure")
+models <- list("Model 1a", "Model 1b")
 
 ui <- function(request) {
         fluidPage(theme = bs_theme(version = 4, bootswatch = "minty"),#, heading_font = font_google("Segoe UI")),
@@ -22,16 +28,21 @@ ui <- function(request) {
                                       width = 180, height = 50, style="float:left; margin-left: 10px; margin-right: 15px; margin-top: 2px; margin-bottom: 30px", label = tags$h4("logo")),
                         actionButton("load_results","Click to load results"),
                         hr(),
-                        selectizeInput(inputId = "exposure_data",
+                        selectizeInput(inputId = "exposure_choice",
                                        label = tags$h4("Exposure type:"),
                                        choices = exposures,
                                        selected = NULL,
                                        multiple = T,
                                        options = list(placeholder = '----------', maxItems = 1)),
-                        hr(),
-                        selectizeInput(inputId = "outcome_data",
+                        selectizeInput(inputId = "outcome_choice",
                                        label = tags$h4("Outcome:"),
                                        choices = outcomes,
+                                       selected = NULL,
+                                       multiple = T,
+                                       options = list(placeholder = '----------', maxItems = 1)),
+                        selectizeInput(inputId = "model_choice",
+                                       label = tags$h4("Model:"),
+                                       choices = models,
                                        selected = NULL,
                                        multiple = T,
                                        options = list(placeholder = '----------', maxItems = 1)),
@@ -52,7 +63,7 @@ ui <- function(request) {
                         tabsetPanel(id = 'main_tabs',
                                 tabPanel("Plot by exposure", icon = icon("chart-simple"),
                                          tabsetPanel(
-                                                tabPanel("Manhattan",
+                                                tabPanel("Manhattan", icon = icon("chart-simple"),
                                                     textOutput('Text1'),
                                                     plotlyOutput("exposureManhattanPlot")
                                                         ),
@@ -61,7 +72,7 @@ ui <- function(request) {
                                                         )
                                                   )
                                          ),
-                                tabPanel("Plot by outcome", icon = icon("chart-simple"),
+                                tabPanel("Plot by Outcome", icon = icon("chart-simple"),
                                          tabsetPanel(
                                                 tabPanel("Manhattan",
                                                     textOutput('Text2'),

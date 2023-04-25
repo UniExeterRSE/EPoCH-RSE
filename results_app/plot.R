@@ -6,23 +6,7 @@ library(shinyjs)
 library(shinyTree)
 
 create_manhattan_plot <- function(df){
-  #adj_pthreshold <- 0.05/nrow(df)
-  p <- ggplot(df,
-              aes(Estimate=est,P=p,Outcome=outcome_linker,Cohorts=cohorts,N=total_n,
-                  x=exposure_subclass_time_dose,y=-log10(p)
-              ))+
-    geom_jitter(aes(colour=outcome_class),alpha=0.5,size=0.5)+
-    #facet_grid(person_exposed~.)+
-    xlab("")+
-    theme_classic()+
-    scale_colour_brewer(palette = "Dark2")+
-    theme(axis.text.x = element_text(angle = 90,hjust=1))+
-    geom_hline(yintercept = -log10(adj_pthreshold),linetype="dashed",colour="grey40")
-  ggplotly(p)
-}
-
-create_exposure_manhattan_plot <- function(df){
-  #adj_pthreshold <- 0.05/nrow(df)
+  adj_pthreshold <- 0.05/nrow(df)
   p <- ggplot(df,
               aes(Estimate=est,P=p,Outcome=outcome_linker,Cohorts=cohorts,N=total_n,
                   x=exposure_subclass_time_dose,y=-log10(p)
@@ -36,6 +20,7 @@ create_exposure_manhattan_plot <- function(df){
     geom_hline(yintercept = -log10(adj_pthreshold),linetype="dashed",colour="grey40")
   ggplotly(p)
 }
+
 
 create_outcome_manhattan_plot <- function(df){
   adj_pthreshold <- 0.05/nrow(df)
@@ -48,10 +33,32 @@ create_outcome_manhattan_plot <- function(df){
     xlab("")+
     theme_classic()+
     scale_colour_brewer(palette = "Dark2")+
-    theme(axis.text.x = element_text(angle = 90,hjust=1))+
+    theme(axis.text.x = element_text(angle = 90,hjust=1), aspect.ratio=4/3)+
     geom_hline(yintercept = -log10(adj_pthreshold),linetype="dashed",colour="grey40")
   ggplotly(p)
 }
+
+create_volcano_plot <- function(df){
+  pthreshold_rank <- rank(-log10(df$p))[which.min(abs(df$p-0.05))]-1
+  adj_pthreshold <- 0.05/nrow(df)
+  adj_pthreshold_rank <- rank(-log10(df$p))[which.min(abs(df$p-adj_pthreshold))]-1
+  Plot <- ggplot(df,
+                 aes(Estimate=est,P=p,Outcome=outcome_linker,Cohorts=cohorts,N=total_n,
+                     x=est_SDM,y=rank(-log10(p)),Exposure=exposure_linker
+                 ))+
+    geom_point(aes(colour=outcome_class),size=0.5,alpha=0.5)+
+    geom_vline(xintercept = 0,colour="grey40")+
+    theme_classic()+
+    scale_colour_brewer(palette = "Dark2")+
+    xlab("Standardised effect estimate")+
+    ylab("Ranked -log10(P)")+
+    facet_grid(.~person_exposed)+  
+    coord_cartesian(xlim=c(-0.75,0.75))+
+    geom_hline(yintercept = pthreshold_rank,linetype="dashed",colour="blue")+
+    geom_hline(yintercept = adj_pthreshold_rank,linetype="dashed",colour="red")
+  ggplotly(Plot,tooltip=c("P","Estimate","Outcome","Exposure","Cohorts","N"))
+}
+
 
 create_exposure_volcano_plot <- function(df){
   pthreshold_rank <- rank(-log10(df$p))[which.min(abs(df$p-0.05))]-1

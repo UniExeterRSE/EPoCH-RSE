@@ -5,21 +5,30 @@ library(shinycssloaders)
 library(shinyjs)
 library(shinyTree)
 
-import_data_dropbox <- function(){
+import_data_dropbox <- function(global_data){
   dropbox_links <- c("https://www.dropbox.com/s/amagzojd4xmj66l/metaphewas_model1a_extracted.RDS?dl=1",
                      "https://www.dropbox.com/s/3ey11hxpqlo6i2h/metaphewas_model1b_extracted.RDS?dl=1"
   )
   all_res <- lapply(dropbox_links,function(x) readRDS(url(x)))
   # a bit of tidying will happen (stick it all together, make lists of unique exposure and outcome classes, make a tibble of unique combinations, put everything in a list and name the objects)
   all_res <- bind_rows(all_res)
-  global_data$active_exp <- unique(all_res$exposure_class)
-  out_classes <- unique(all_res$outcome_class)
+  global_data$exp_classes <- unique(all_res$exposure_class)
+  global_data$out_classes <- unique(all_res$outcome_class)
   all_res_tib <- as_tibble(unique(all_res[,c("exposure_class", "exposure_subclass", "person_exposed", "exposure_time", "exposure_type", "exposure_source", "exposure_dose", "model")]))
-  imported_data <- list(all_res,exp_classes,out_classes,all_res_tib)
+  imported_data <- list(all_res,global_data$exp_classes,global_data$out_classes,all_res_tib)
   names(imported_data) <- c("all_res","exp_classes","out_classes","all_res_tib")
 
   #print(imported_data)
   return(imported_data)
+}
+
+create_exposure_manhattan_dfs <- function(exposureclass,dat){
+  df <- dat[dat$exposure_class==exposureclass&dat$person_exposed!="child",]
+  df$exposure_dose_ordered <- factor(df$exposure_dose,ordered=T,levels=c("light","moderate","heavy"))
+  df <- df[order(df$exposure_subclass,df$exposure_time,df$exposure_dose_ordered),]
+  df$exposure_subclass_time_dose <- paste(df$exposure_subclass,df$exposure_time,df$exposure_dose)
+  df$exposure_subclass_time_dose<-factor(df$exposure_subclass_time_dose,ordered=T,levels=unique(df$exposure_subclass_time_dose))
+  df
 }
 
 ## For X axis = exposures
@@ -32,6 +41,16 @@ create_exposure_manhattan_dfs <- function(exposureclass,dat){
   df
 }
 
+## For X axis = exposures
+filter_exposure_dfs <- function(exposureclass,dat){
+  filtered_df <- dat[dat$exposure_class==exposureclass&dat$person_exposed!="child",]
+  filtered_df$exposure_dose_ordered <- factor(filtered_df$exposure_dose,ordered=T,levels=c("light","moderate","heavy"))
+  filtered_df <- filtered_df[order(filtered_df$exposure_subclass,filtered_df$exposure_time,filtered_df$exposure_dose_ordered),]
+  filtered_df$exposure_subclass_time_dose <- paste(filtered_df$exposure_subclass,filtered_df$exposure_time,filtered_df$exposure_dose)
+  filtered_df$exposure_subclass_time_dose<-factor(filtered_df$exposure_subclass_time_dose,ordered=T,levels=unique(filtered_df$exposure_subclass_time_dose))
+  return(filtered_df)
+}
+
 ## For X axis = outcomes
 create_outcome_manhattan_dfs <- function(outcomeclass,dat){
   df <- dat[dat$outcome_class==outcomeclass&dat$person_exposed!="child",]
@@ -41,6 +60,17 @@ create_outcome_manhattan_dfs <- function(outcomeclass,dat){
   df$outcome_subclass_time<-factor(df$outcome_subclass_time,ordered=T,levels=unique(df$outcome_subclass_time))
   df
 }
+
+## For X axis = outcomes
+filter_outcome_dfs <- function(outcomeclass,dat){
+  filtered_df <- dat[dat$outcome_class==outcomeclass&dat$person_exposed!="child",]
+  filtered_df$outcome_time_ordered <- factor(filtered_df$outcome_time,ordered=T,levels=c("pregnancy","delivery","first year", "age 1-2","age 3-4","age 5-7","age 8-11","anytime in childhood"))
+  filtered_df <- filtered_df[order(filtered_df$outcome_subclass1,filtered_df$outcome_subclass2,filtered_df$outcome_time_ordered),]
+  filtered_df$outcome_subclass_time <- paste(filtered_df$outcome_subclass1,filtered_df$outcome_subclass2,filtered_df$outcome_time)
+  filtered_df$outcome_subclass_time<-factor(filtered_df$outcome_subclass_time,ordered=T,levels=unique(filtered_df$outcome_subclass_time))
+  return(filtered_df)
+}
+
 
 # by exposure
 create_exposure_dfs <- function(exposureclass,dat){
