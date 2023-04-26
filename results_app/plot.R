@@ -4,21 +4,27 @@ library(plotly)
 library(shinycssloaders)
 library(shinyjs)
 library(shinyTree)
+library(RColorBrewer)
+library(stringr)
+
+set.seed(194375)
+ncols <- 190
+expanded_dark2 <- sample(colorRampPalette(brewer.pal(8, "Dark2"))(ncols))
 
 create_manhattan_plot <- function(df){
   adj_pthreshold <- 0.05/nrow(df)
   p <- ggplot(df,
               aes(Estimate=est,P=p,Outcome=outcome_linker,Cohorts=cohorts,N=total_n,
-                  x=exposure_subclass_time_dose,y=-log10(p)
+                  x=str_to_sentence(exposure_subclass_time_dose),y=-log10(p)
               ))+
-    geom_jitter(aes(colour=outcome_class),alpha=0.5,size=0.5)+
-    facet_grid(person_exposed~.)+
+    geom_jitter(aes(colour=exposure_subclass_time_dose),alpha=0.5,size=0.5, show.legend=FALSE)+
+    #facet_grid(person_exposed~.)+
     xlab("")+
     theme_classic()+
-    scale_colour_brewer(palette = "Dark2")+
-    theme(axis.text.x = element_text(angle = 90,hjust=1))+
+    scale_colour_manual(values=expanded_dark2)+
+    theme(axis.text.x = element_text(angle = 90,hjust=1), legend.position="none")+
     geom_hline(yintercept = -log10(adj_pthreshold),linetype="dashed",colour="grey40")
-  ggplotly(p)
+  ggplotly(p, height = 720)
 }
 
 
@@ -26,16 +32,16 @@ create_outcome_manhattan_plot <- function(df){
   adj_pthreshold <- 0.05/nrow(df)
   p <- ggplot(df,
               aes(Estimate=est,P=p,Exposure=exposure_linker,Cohorts=cohorts,N=total_n,
-                  x=outcome_subclass_time,y=-log10(p)
+                  x=str_to_sentence(outcome_subclass_time),y=-log10(p)
               ))+
-    geom_jitter(aes(colour=exposure_class),alpha=0.5,size=0.5)+
-    facet_grid(person_exposed~.)+
+    geom_jitter(aes(colour=outcome_subclass_time),alpha=0.5,size=0.5)+
+    #facet_grid(person_exposed~.)+
     xlab("")+
     theme_classic()+
-    scale_colour_brewer(palette = "Dark2")+
-    theme(axis.text.x = element_text(angle = 90,hjust=1), aspect.ratio=4/3)+
+    scale_colour_manual(values=expanded_dark2)+
+    theme(axis.text.x = element_text(angle = 90,hjust=1), legend.position="none")+
     geom_hline(yintercept = -log10(adj_pthreshold),linetype="dashed",colour="grey40")
-  ggplotly(p)
+  ggplotly(p, height = 720)
 }
 
 create_volcano_plot <- function(df){
@@ -56,7 +62,7 @@ create_volcano_plot <- function(df){
     coord_cartesian(xlim=c(-0.75,0.75))+
     geom_hline(yintercept = pthreshold_rank,linetype="dashed",colour="blue")+
     geom_hline(yintercept = adj_pthreshold_rank,linetype="dashed",colour="red")
-  ggplotly(Plot,tooltip=c("P","Estimate","Outcome","Exposure","Cohorts","N"))
+  ggplotly(Plot, tooltip=c("P","Estimate","Outcome","Exposure","Cohorts","N"), height = 580)
 }
 
 
