@@ -12,28 +12,21 @@ observeEvent(input$plot_data,{
   ## then the visualisations appear...
     ## a manhattan plot
 
-print(global_data$df_models)
-
 output$exposureManhattanPlot <- renderPlotly({
     model <- global_data$df_models$shortname[global_data$df_models$name == input$model_choice]
     dat <- global_data$data$all_res[which(global_data$data$all_res$model==model),]
+    print(dat)
     exp_df <- create_exposure_dfs(tolower(input$exposure_choice),dat)
     #print(exp_df$person_exposed)
     create_manhattan_plot(exp_df)
   })
     ## and a volcano plot
 output$exposureVolcanoPlot <- renderPlotly({
-    model <- global_data$df_models$shortname[global_data$df_models$name == input$model]
+    model <- global_data$df_models$shortname[global_data$df_models$name == input$model_choice]
     dat <- global_data$data$all_res[which(global_data$data$all_res$model==model),]
-    exp_df <- create_exposure_dfs(tolower(input$exposure_choice),dat)
-    create_volcano_plot(exp_df)
-})
-
-output$exposurePlot <- renderPlotly({
-    model <- global_data$df_models$shortname[global_data$df_models$name == input$model]
-    dat <- global_data$data$all_res[which(global_data$data$all_res$model==model),]
-    exp_df <- create_exposure_dfs(tolower(input$exposure_choice),dat)
-    create_volcano_plot(exp_df)
+    print(dat)
+    exp_df <- create_exposure_volcano_dfs(tolower(input$exposure_choice),dat)
+    create_exposure_volcano_plot(exp_df)
 })
 
 })

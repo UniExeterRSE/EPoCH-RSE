@@ -17,8 +17,8 @@ outcomes <- list("Any", "Perinatal survival", "Immunological", "Body size and co
 models <- list("Model 1a", "Model 1b")
 
 ui <- function(request) {
-        fluidPage(theme = bs_theme(version = 4, bootswatch = "minty"),#, heading_font = font_google("Segoe UI")),
-                  id = 'epoch', windowTitle = "EPoCH data analysis tool",
+        fluidPage(title = "EPoCH data analysis tool", id = 'epoch',
+                  theme = bs_theme(version = 4, bootswatch = "minty"),#, heading_font = font_google("Segoe UI")),
                   hr(),
         # User Input Section -------------------------------
         sidebarLayout(

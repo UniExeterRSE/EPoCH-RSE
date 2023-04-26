@@ -21,7 +21,6 @@ loaded_data <- observeEvent(input$load_results,{
   global_data$df_models <- data.frame(name=paste0("Model ",as.vector(outer(1:4, letters[1:3], paste0))),
                         shortname=paste0("model",as.vector(outer(1:4, letters[1:3], paste0)))
                                      )
-  print(global_data$df_models)
   # And loaded_data will be returned for use elsewhere in the app
   global_data$data <- loaded_data
 })
