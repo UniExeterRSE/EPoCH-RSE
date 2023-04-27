@@ -11,6 +11,7 @@ set.seed(67483)
 ncols <- 190
 expanded_dark2 <- sample(colorRampPalette(brewer.pal(8, "Dark2"))(ncols))
 
+# Introduce a function to allow horizontal line plotting in plot_ly
 hline <- function(y = 0, colour = "#898989") {
   list(
     type = "line",
