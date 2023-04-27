@@ -6,49 +6,37 @@ library(shinyjs)
 library(shinyTree)
 library(RCurl)
 
+
+format_loaded_data <- function(global_data, loaded_data){
+  # a bit of tidying will happen (stick it all together, make lists of unique exposure and outcome classes, make a tibble of unique combinations, put everything in a list and name the objects)
+  loaded_data <- bind_rows(loaded_data)
+  global_data$exp_classes <- unique(loaded_data$exposure_class)
+  global_data$out_classes <- unique(loaded_data$outcome_class)
+  all_res_tib <- as_tibble(unique(loaded_data[,c("exposure_class", "exposure_subclass", "person_exposed", "exposure_time", "exposure_type", "exposure_source", "exposure_dose", "model")]))
+  formatted_data <- list(loaded_data,global_data$exp_classes,global_data$out_classes,all_res_tib)
+  names(formatted_data) <- c("all_res","exp_classes","out_classes","all_res_tib")
+
+  formatted_data
+}
+
 import_data_dropbox <- function(global_data){
   dropbox_links <- c("https://www.dropbox.com/s/amagzojd4xmj66l/metaphewas_model1a_extracted.RDS?dl=1",
                      "https://www.dropbox.com/s/3ey11hxpqlo6i2h/metaphewas_model1b_extracted.RDS?dl=1"
   )
   all_res <- lapply(dropbox_links,function(x) readRDS(url(x)))
-  # a bit of tidying will happen (stick it all together, make lists of unique exposure and outcome classes, make a tibble of unique combinations, put everything in a list and name the objects)
-  all_res <- bind_rows(all_res)
-  global_data$exp_classes <- unique(all_res$exposure_class)
-  global_data$out_classes <- unique(all_res$outcome_class)
-  all_res_tib <- as_tibble(unique(all_res[,c("exposure_class", "exposure_subclass", "person_exposed", "exposure_time", "exposure_type", "exposure_source", "exposure_dose", "model")]))
-  imported_data <- list(all_res,global_data$exp_classes,global_data$out_classes,all_res_tib)
-  names(imported_data) <- c("all_res","exp_classes","out_classes","all_res_tib")
+  imported_data <- format_loaded_data(global_data, all_res)
 
   return(imported_data)
 }
 
-import_data_github <- function(global_data){
-  github_links <- c("https://raw.github.com/EdHone/RSE-EPoCH-data/main/RDS/metaphewas_model1a_extracted.RDS",
-                    "https://raw.github.com/EdHone/RSE-EPoCH-data/main/RDS/metaphewas_model1b_extracted.RDS"
+import_data_local <- function(global_data){
+  file_paths <- c("../data/rds/metaphewas_model1a_extracted.RDS",
+                  "../data/rds/metaphewas_model1b_extracted.RDS"
   )
+  all_res <- lapply(file_paths,function(x) readRDS(x))
+  imported_data <- format_loaded_data(global_data, all_res)
 
-  x <- lapply(github_links,function(x) getURL(x, .opts=curlOptions(followlocation = TRUE)))
-  #print(x)
-  #y <- lapply(x, function(y) read.csv(text = x)
-
-
-  #y <- getURL("https://raw.github.com/EdHone/RSE-EPoCH-data/main/csv/metaphewas_model1a_extracted.csv")
-  #z <- read.csv(text = y)
-  #copied_files <- lapply(github_links,function(x) getURL(x))
-  #print(copied_files)
-  #z <- read.csv(text = copied_files)
-
-  #print(copied_files)
-  #all_res <- lapply(github_links,function(x) read.csv(getURL(x)))
-  # a bit of tidying will happen (stick it all together, make lists of unique exposure and outcome classes, make a tibble of unique combinations, put everything in a list and name the objects)
-  #all_res <- bind_rows(all_res)
-  #global_data$exp_classes <- unique(all_res$exposure_class)
-  #global_data$out_classes <- unique(all_res$outcome_class)
-  #all_res_tib <- as_tibble(unique(all_res[,c("exposure_class", "exposure_subclass", "person_exposed", "exposure_time", "exposure_type", "exposure_source", "exposure_dose", "model")]))
-  #imported_data <- list(all_res,global_data$exp_classes,global_data$out_classes,all_res_tib)
-  #names(imported_data) <- c("all_res","exp_classes","out_classes","all_res_tib")
-
-  #return(imported_data)
+  return(imported_data)
 }
 
 create_exposure_dfs <- function(exposureclass,dat){

@@ -39,7 +39,8 @@ ui <- function(request) {
                             ')),
                         # Logo
                         tags$img(src="https://cpb-eu-w2.wpmucdn.com/blogs.bristol.ac.uk/dist/c/500/files/2018/11/Untitled-26hzp4l.png",
-                                      width = 180, height = 50, style="float:left; margin-left: 10px; margin-right: 15px; margin-top: 2px; margin-bottom: 30px", label = tags$h4("logo")),
+                                      width = 180, height = 50, label = tags$h4("logo")),
+                        hr(),
                         actionButton("load_results","Click to load results"),
                         hr(),
                         selectizeInput(inputId = "exposure_choice",

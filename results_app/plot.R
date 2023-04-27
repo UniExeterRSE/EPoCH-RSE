@@ -24,6 +24,7 @@ hline <- function(y = 0, colour = "#898989") {
   )
 }
 
+
 create_exposure_manhattan_plotly <- function(df, height){
   adj_pthreshold <- 0.05/nrow(df)
   df %>%
