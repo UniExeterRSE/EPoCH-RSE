@@ -27,6 +27,48 @@ create_exposure_manhattan_plot <- function(df){
   ggplotly(p, height = 720)
 }
 
+create_exposure_manhattan_plotly <- function(df){
+  adj_pthreshold <- 0.05/nrow(df)
+  df %>%
+    plot_ly(height = 600) %>% 
+    add_markers(x = ~jitter(as.numeric(exposure_subclass_time_dose)), y =~-log10(p), color = ~exposure_subclass_time_dose,
+                marker = list(size = 6), alpha=0.5,
+                hoverinfo = "text",
+                text = ~paste0("Exposure type: ",exposure_subclass_time_dose,
+                               "<br>Outcome: ",outcome_subclass_time,
+                               "<br>p value: ",p),
+                showlegend = FALSE) %>% 
+    layout(legend = list(orientation = "h",
+                         x =0.5, xanchor = "center",
+                         y = 1, yanchor = "bottom"
+                         ),
+           xaxis = list(title = "Exposure type",
+                        ticktext = ~str_to_sentence(exposure_subclass_time_dose),
+                        tickvals = ~as.numeric(exposure_subclass_time_dose),
+                        tickmode = "array"))
+}
+
+create_exposure_box_plotly <- function(df){
+  adj_pthreshold <- 0.05/nrow(df)
+  df %>%
+    plot_ly(height = 600) %>% 
+    add_trace(x = ~as.numeric(exposure_subclass_time_dose),y = ~-log10(p), color = ~exposure_subclass_time_dose,
+              type = "box", 
+              hoverinfo = "text",
+              text = ~paste0("Exposure type: ",exposure_subclass_time_dose,
+                               "<br>Outcome: ",outcome_subclass_time,
+                               "<br>p value: ",p),
+              showlegend = FALSE) %>%
+    layout(legend = list(orientation = "h",
+                         x =0.5, xanchor = "center",
+                         y = 1, yanchor = "bottom"
+                         ),
+           xaxis = list(title = "Exposure type",
+                        ticktext = ~str_to_sentence(exposure_subclass_time_dose),
+                        tickvals = ~as.numeric(exposure_subclass_time_dose),
+                        tickmode = "array"))
+}
+
 create_hl_exposure_manhattan_plot <- function(df){
   adj_pthreshold <- 0.05/nrow(df)
   p <- ggplot(df,
@@ -40,7 +82,7 @@ create_hl_exposure_manhattan_plot <- function(df){
     scale_colour_manual(values=expanded_dark2)+
     theme(axis.text.x = element_text(angle = 90,hjust=1), legend.position="none")+
     geom_hline(yintercept = -log10(adj_pthreshold),linetype="dashed",colour="grey40")
-  ggplotly(p, height = 720)
+  ggplotly(p, height = 600)
 }
 
 create_outcome_manhattan_plot <- function(df){
