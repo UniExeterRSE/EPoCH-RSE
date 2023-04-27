@@ -23,6 +23,20 @@ ui <- function(request) {
         # User Input Section -------------------------------
         sidebarLayout(
                 sidebarPanel( width = 3,
+                        # Java scriptlet to get window dimensions
+                        tags$head(tags$script('
+                                var dimension = [0, 0];
+                                $(document).on("shiny:connected", function(e) {
+                                    dimension[0] = window.innerWidth;
+                                    dimension[1] = window.innerHeight;
+                                    Shiny.onInputChange("dimension", dimension);
+                                });
+                                $(window).resize(function(e) {
+                                    dimension[0] = window.innerWidth;
+                                    dimension[1] = window.innerHeight;
+                                    Shiny.onInputChange("dimension", dimension);
+                                });
+                            ')),
                         # Logo
                         tags$img(src="https://cpb-eu-w2.wpmucdn.com/blogs.bristol.ac.uk/dist/c/500/files/2018/11/Untitled-26hzp4l.png",
                                       width = 180, height = 50, style="float:left; margin-left: 10px; margin-right: 15px; margin-top: 2px; margin-bottom: 30px", label = tags$h4("logo")),

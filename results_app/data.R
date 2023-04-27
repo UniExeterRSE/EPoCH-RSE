@@ -82,7 +82,7 @@ create_outcome_dfs <- function(outcomeclass,dat){
   } else {
     df <- dat[dat$outcome_class==outcomeclass&dat$person_exposed!="child",]
   }
-  
+
   df$outcome_time_ordered <- factor(df$outcome_time,ordered=T,levels=c("pregnancy","delivery","first year", "age 1-2","age 3-4","age 5-7","age 8-11","anytime in childhood"))
   df <- df[order(df$outcome_subclass1,df$outcome_subclass2,df$outcome_time_ordered),]
   df$outcome_subclass_time <- paste(df$outcome_subclass1,df$outcome_subclass2,df$outcome_time)

@@ -11,26 +11,22 @@ set.seed(67483)
 ncols <- 190
 expanded_dark2 <- sample(colorRampPalette(brewer.pal(8, "Dark2"))(ncols))
 
-create_exposure_manhattan_plot <- function(df){
-  adj_pthreshold <- 0.05/nrow(df)
-  p <- ggplot(df,
-              aes(Estimate=est,P=p,Outcome=outcome_linker,Cohorts=cohorts,N=total_n,
-                  x=str_to_sentence(exposure_subclass_time_dose),y=-log10(p)
-              ))+
-    geom_jitter(aes(colour=exposure_subclass_time_dose),alpha=0.5,size=0.5, show.legend=FALSE)+
-    #facet_grid(person_exposed~.)+
-    xlab("")+
-    theme_classic()+
-    scale_colour_manual(values=expanded_dark2)+
-    theme(axis.text.x = element_text(angle = 90,hjust=1), legend.position="none")+
-    geom_hline(yintercept = -log10(adj_pthreshold),linetype="dashed",colour="grey40")
-  ggplotly(p, height = 720)
+hline <- function(y = 0, colour = "#898989") {
+  list(
+    type = "line",
+    x0 = 0,
+    x1 = 1,
+    xref = "paper",
+    y0 = y,
+    y1 = y,
+    line = list(color = colour, dash="dash")
+  )
 }
 
-create_exposure_manhattan_plotly <- function(df){
+create_exposure_manhattan_plotly <- function(df, height){
   adj_pthreshold <- 0.05/nrow(df)
   df %>%
-    plot_ly(height = 600) %>% 
+    plot_ly(height = height) %>% 
     add_markers(x = ~jitter(as.numeric(exposure_subclass_time_dose)), y =~-log10(p), color = ~exposure_subclass_time_dose,
                 marker = list(size = 6), alpha=0.5,
                 hoverinfo = "text",
@@ -38,13 +34,64 @@ create_exposure_manhattan_plotly <- function(df){
                                "<br>Outcome: ",outcome_subclass_time,
                                "<br>p value: ",p),
                 showlegend = FALSE) %>% 
-    layout(legend = list(orientation = "h",
-                         x =0.5, xanchor = "center",
-                         y = 1, yanchor = "bottom"
-                         ),
+    layout(shapes = list(hline(-log10(adj_pthreshold))),
            xaxis = list(title = "Exposure type",
                         ticktext = ~str_to_sentence(exposure_subclass_time_dose),
                         tickvals = ~as.numeric(exposure_subclass_time_dose),
+                        tickmode = "array"))
+}
+
+create_hl_exposure_manhattan_plotly <- function(df, height){
+  adj_pthreshold <- 0.05/nrow(df)
+  df %>%
+    plot_ly(height = height) %>% 
+    add_markers(x = ~jitter(as.numeric(exposure_class)), y =~-log10(p), color = ~exposure_class,
+                marker = list(size = 6), alpha=0.5,
+                hoverinfo = "text",
+                text = ~paste0("Exposure type: ",exposure_subclass_time_dose,
+                               "<br>Outcome: ",outcome_subclass_time,
+                               "<br>p value: ",p),
+                showlegend = FALSE) %>% 
+    layout(shapes = list(hline(-log10(adj_pthreshold))),
+           xaxis = list(title = "Exposure type",
+                        ticktext = ~str_to_sentence(exposure_class),
+                        tickvals = ~as.numeric(exposure_class),
+                        tickmode = "array"))
+}
+
+create_outcome_manhattan_plotly <- function(df, height){
+  adj_pthreshold <- 0.05/nrow(df)
+  df %>%
+    plot_ly(height = height) %>% 
+    add_markers(x = ~jitter(as.numeric(outcome_subclass_time)), y =~-log10(p), color = ~outcome_subclass_time,
+                marker = list(size = 6), alpha=0.5,
+                hoverinfo = "text",
+                text = ~paste0("Exposure type: ",exposure_subclass_time_dose,
+                               "<br>Outcome: ",outcome_subclass_time,
+                               "<br>p value: ",p),
+                showlegend = FALSE) %>% 
+    layout(shapes = list(hline(-log10(adj_pthreshold))),
+           xaxis = list(title = "Outcome",
+                        ticktext = ~str_to_sentence(outcome_subclass_time),
+                        tickvals = ~as.numeric(outcome_subclass_time),
+                        tickmode = "array"))
+}
+
+create_hl_outcome_manhattan_plotly <- function(df, height){
+  adj_pthreshold <- 0.05/nrow(df)
+  df %>%
+    plot_ly(height = height) %>% 
+    add_markers(x = ~jitter(as.numeric(outcome_class)), y =~-log10(p), color = ~outcome_class,
+                marker = list(size = 6), alpha=0.5,
+                hoverinfo = "text",
+                text = ~paste0("Exposure type: ",exposure_subclass_time_dose,
+                               "<br>Outcome: ",outcome_subclass_time,
+                               "<br>p value: ",p),
+                showlegend = FALSE) %>% 
+    layout(shapes = list(hline(-log10(adj_pthreshold))),
+           xaxis = list(title = "Outcome",
+                        ticktext = ~str_to_sentence(outcome_class),
+                        tickvals = ~as.numeric(outcome_class),
                         tickmode = "array"))
 }
 
@@ -59,83 +106,30 @@ create_exposure_box_plotly <- function(df){
                                "<br>Outcome: ",outcome_subclass_time,
                                "<br>p value: ",p),
               showlegend = FALSE) %>%
-    layout(legend = list(orientation = "h",
-                         x =0.5, xanchor = "center",
-                         y = 1, yanchor = "bottom"
-                         ),
+    layout(shapes = list(hline(-log10(adj_pthreshold))),
            xaxis = list(title = "Exposure type",
                         ticktext = ~str_to_sentence(exposure_subclass_time_dose),
                         tickvals = ~as.numeric(exposure_subclass_time_dose),
                         tickmode = "array"))
 }
 
-create_hl_exposure_manhattan_plot <- function(df){
-  adj_pthreshold <- 0.05/nrow(df)
-  p <- ggplot(df,
-              aes(Estimate=est,P=p,Outcome=outcome_linker,Cohorts=cohorts,N=total_n,
-                  x=str_to_sentence(exposure_class),y=-log10(p)
-              ))+
-    geom_jitter(aes(colour=exposure_class),alpha=0.5,size=0.5, show.legend=FALSE)+
-    #facet_grid(person_exposed~.)+
-    xlab("")+
-    theme_classic()+
-    scale_colour_manual(values=expanded_dark2)+
-    theme(axis.text.x = element_text(angle = 90,hjust=1), legend.position="none")+
-    geom_hline(yintercept = -log10(adj_pthreshold),linetype="dashed",colour="grey40")
-  ggplotly(p, height = 600)
-}
-
-create_outcome_manhattan_plot <- function(df){
-  adj_pthreshold <- 0.05/nrow(df)
-  p <- ggplot(df,
-              aes(Estimate=est,P=p,Exposure=exposure_linker,Cohorts=cohorts,N=total_n,
-                  x=str_to_sentence(outcome_subclass_time),y=-log10(p)
-              ))+
-    geom_jitter(aes(colour=outcome_subclass_time),alpha=0.5,size=0.5)+
-    #facet_grid(person_exposed~.)+
-    xlab("")+
-    theme_classic()+
-    scale_colour_manual(values=expanded_dark2)+
-    theme(axis.text.x = element_text(angle = 90,hjust=1), legend.position="none")+
-    geom_hline(yintercept = -log10(adj_pthreshold),linetype="dashed",colour="grey40")
-  ggplotly(p, height = 720)
-}
-
-create_hl_outcome_manhattan_plot <- function(df){
-  adj_pthreshold <- 0.05/nrow(df)
-  p <- ggplot(df,
-              aes(Estimate=est,P=p,Exposure=exposure_linker,Cohorts=cohorts,N=total_n,
-                  x=str_to_sentence(outcome_class),y=-log10(p)
-              ))+
-    geom_jitter(aes(colour=outcome_class),alpha=0.5,size=0.5)+
-    #facet_grid(person_exposed~.)+
-    xlab("")+
-    theme_classic()+
-    scale_colour_manual(values=expanded_dark2)+
-    theme(axis.text.x = element_text(angle = 90,hjust=1), legend.position="none")+
-    geom_hline(yintercept = -log10(adj_pthreshold),linetype="dashed",colour="grey40")
-  ggplotly(p, height = 720)
-}
-
 create_volcano_plot <- function(df){
   pthreshold_rank <- rank(-log10(df$p))[which.min(abs(df$p-0.05))]-1
   adj_pthreshold <- 0.05/nrow(df)
   adj_pthreshold_rank <- rank(-log10(df$p))[which.min(abs(df$p-adj_pthreshold))]-1
-  Plot <- ggplot(df,
-                 aes(Estimate=est,P=p,Outcome=outcome_linker,Cohorts=cohorts,N=total_n,
-                     x=est_SDM,y=rank(-log10(p)),Exposure=exposure_linker
-                 ))+
-    geom_point(aes(colour=outcome_class),size=0.5,alpha=0.5)+
-    geom_vline(xintercept = 0,colour="grey40")+
-    theme_classic()+
-    scale_colour_brewer(palette = "Dark2")+
-    xlab("Standardised effect estimate")+
-    ylab("Ranked -log10(P)")+
-    facet_grid(.~person_exposed)+  
-    coord_cartesian(xlim=c(-0.75,0.75))+
-    geom_hline(yintercept = pthreshold_rank,linetype="dashed",colour="blue")+
-    geom_hline(yintercept = adj_pthreshold_rank,linetype="dashed",colour="red")
-  ggplotly(Plot, tooltip=c("P","Estimate","Outcome","Exposure","Cohorts","N"), height = 580)
+
+  df %>%
+    plot_ly(height = 540) %>%
+    add_markers(x = ~est_SDM,y = ~rank(-log10(p)), color = ~outcome_class,
+              marker = list(size = 6), alpha=0.5,
+              hoverinfo = "text",
+              text = ~paste0("Exposure type: ",exposure_subclass_time_dose,
+                             "<br>Outcome: ",outcome_subclass_time,
+                             "<br>p value: ",p),
+              showlegend = FALSE) %>% 
+    layout(xaxis = list(title = "Standardised effect estimate",
+                        range = list(-0.75, 0.75)),
+           yaxis = list(title = "Ranked -log10(P)"))
 }
 
 
