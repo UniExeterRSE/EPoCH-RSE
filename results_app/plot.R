@@ -7,11 +7,11 @@ library(shinyTree)
 library(RColorBrewer)
 library(stringr)
 
-set.seed(194375)
+set.seed(67483)
 ncols <- 190
 expanded_dark2 <- sample(colorRampPalette(brewer.pal(8, "Dark2"))(ncols))
 
-create_manhattan_plot <- function(df){
+create_exposure_manhattan_plot <- function(df){
   adj_pthreshold <- 0.05/nrow(df)
   p <- ggplot(df,
               aes(Estimate=est,P=p,Outcome=outcome_linker,Cohorts=cohorts,N=total_n,
@@ -27,6 +27,21 @@ create_manhattan_plot <- function(df){
   ggplotly(p, height = 720)
 }
 
+create_hl_exposure_manhattan_plot <- function(df){
+  adj_pthreshold <- 0.05/nrow(df)
+  p <- ggplot(df,
+              aes(Estimate=est,P=p,Outcome=outcome_linker,Cohorts=cohorts,N=total_n,
+                  x=str_to_sentence(exposure_class),y=-log10(p)
+              ))+
+    geom_jitter(aes(colour=exposure_class),alpha=0.5,size=0.5, show.legend=FALSE)+
+    #facet_grid(person_exposed~.)+
+    xlab("")+
+    theme_classic()+
+    scale_colour_manual(values=expanded_dark2)+
+    theme(axis.text.x = element_text(angle = 90,hjust=1), legend.position="none")+
+    geom_hline(yintercept = -log10(adj_pthreshold),linetype="dashed",colour="grey40")
+  ggplotly(p, height = 720)
+}
 
 create_outcome_manhattan_plot <- function(df){
   adj_pthreshold <- 0.05/nrow(df)
@@ -35,6 +50,22 @@ create_outcome_manhattan_plot <- function(df){
                   x=str_to_sentence(outcome_subclass_time),y=-log10(p)
               ))+
     geom_jitter(aes(colour=outcome_subclass_time),alpha=0.5,size=0.5)+
+    #facet_grid(person_exposed~.)+
+    xlab("")+
+    theme_classic()+
+    scale_colour_manual(values=expanded_dark2)+
+    theme(axis.text.x = element_text(angle = 90,hjust=1), legend.position="none")+
+    geom_hline(yintercept = -log10(adj_pthreshold),linetype="dashed",colour="grey40")
+  ggplotly(p, height = 720)
+}
+
+create_hl_outcome_manhattan_plot <- function(df){
+  adj_pthreshold <- 0.05/nrow(df)
+  p <- ggplot(df,
+              aes(Estimate=est,P=p,Exposure=exposure_linker,Cohorts=cohorts,N=total_n,
+                  x=str_to_sentence(outcome_class),y=-log10(p)
+              ))+
+    geom_jitter(aes(colour=outcome_class),alpha=0.5,size=0.5)+
     #facet_grid(person_exposed~.)+
     xlab("")+
     theme_classic()+

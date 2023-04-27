@@ -15,19 +15,29 @@ observeEvent(input$plot_data,{
 output$exposureManhattanPlot <- renderPlotly({
     model <- global_data$df_models$shortname[global_data$df_models$name == input$model_choice]
     dat <- global_data$data$all_res[which(global_data$data$all_res$model==model),]
-    exp_df <- create_exposure_dfs(tolower(input$exposure_choice),dat)
-    filtered_df <- create_outcome_dfs(tolower(input$outcome_choice),exp_df)
-    print(filtered_df)
-    create_manhattan_plot(filtered_df)
+
+    print(input$exposure_choice)
+    print(input$outcome_choice)
+    if (input$exposure_choice == "All" && input$outcome_choice == "All") {
+      create_hl_exposure_manhattan_plot(dat)
+    } else {
+      exp_df <- create_exposure_dfs(tolower(input$exposure_choice),dat)
+      filtered_df <- create_outcome_dfs(tolower(input$outcome_choice),exp_df)
+      create_exposure_manhattan_plot(filtered_df)
+    }
 })
 
 output$outcomeManhattanPlot <- renderPlotly({
     model <- global_data$df_models$shortname[global_data$df_models$name == input$model_choice]
     dat <- global_data$data$all_res[which(global_data$data$all_res$model==model),]
-    outc_df <- create_outcome_dfs(tolower(input$outcome_choice),dat)
-    filtered_df <- create_exposure_dfs(tolower(input$exposure_choice),outc_df)
-    #print(exp_df$person_exposed)
-    create_outcome_manhattan_plot(filtered_df)
+
+    if (input$outcome_choice == "All" && input$exposure_choice == "All") {
+      create_hl_outcome_manhattan_plot(dat)
+    } else {
+      outc_df <- create_outcome_dfs(tolower(input$outcome_choice),dat)
+      filtered_df <- create_exposure_dfs(tolower(input$exposure_choice),outc_df)
+      create_outcome_manhattan_plot(filtered_df)
+    }
 })
 
 output$exposureVolcanoPlot <- renderPlotly({

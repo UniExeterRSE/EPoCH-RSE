@@ -54,7 +54,7 @@ import_data_github <- function(global_data){
 create_exposure_dfs <- function(exposureclass,dat){
 
   if (exposureclass == "all") {
-    df <- dat
+    df <- dat[dat$person_exposed!="child",]
   } else {
     df <- dat[dat$exposure_class==exposureclass&dat$person_exposed!="child",]
   }
@@ -76,10 +76,11 @@ create_exposure_dfs <- function(exposureclass,dat){
 
 create_outcome_dfs <- function(outcomeclass,dat){
 
+  print(dat)
   if (outcomeclass == "all") {
-    df <- dat
+    df <- dat[dat$person_exposed!="child",]
   } else {
-    df <- dat[dat$outcomeclass==outcomeclass&dat$person_exposed!="child",]
+    df <- dat[dat$outcome_class==outcomeclass&dat$person_exposed!="child",]
   }
   
   df$outcome_time_ordered <- factor(df$outcome_time,ordered=T,levels=c("pregnancy","delivery","first year", "age 1-2","age 3-4","age 5-7","age 8-11","anytime in childhood"))

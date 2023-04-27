@@ -12,7 +12,7 @@ source("data.R")
 source("plot.R")
 
 # Hard coded choices for comparisons
-exposures <- list("All", "Smoking", "Alcohol consumption", "Cafeine consumption", "Socioeconomic position", "Physical activity", "Diet")
+exposures <- list("All", "Smoking", "Alcohol consumption", "Caffeine consumption", "Socioeconomic position", "Physical activity", "Diet")
 outcomes <- list("All", "Perinatal survival", "Immunological", "Body size and composition", "Psychosocial and cognitive", "Serum biomarkers", "Negative control outcomes", "Blood pressure")
 models <- list("Model 1a", "Model 1b")
 
