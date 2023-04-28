@@ -64,7 +64,6 @@ create_exposure_dfs <- function(exposureclass,dat){
 
 create_outcome_dfs <- function(outcomeclass,dat){
 
-  print(dat)
   if (outcomeclass == "all") {
     df <- dat[dat$person_exposed!="child",]
   } else {

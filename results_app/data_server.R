@@ -22,5 +22,6 @@ loaded_data <- observeEvent(input$load_results,{
                         shortname=paste0("model",as.vector(outer(1:4, letters[1:3], paste0)))
                                      )
   # And loaded_data will be returned for use elsewhere in the app
+  global_data$data_is_loaded = TRUE
   global_data$data <- loaded_data
 })

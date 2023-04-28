@@ -113,13 +113,12 @@ ui <- function(request) {
 
 server <- function(input, output, session) {
 
-  global_data <- reactiveValues(data = NULL, active_models = NULL, active_exp = NULL)
+  global_data <- reactiveValues(data = NULL, data_is_loaded = FALSE,
+                                active_models = NULL, active_exp = NULL)
 
   source("data_server.R",local=T)$value
   source("plot_server.R",local=T)$value
-  #source("tab2_server_exposures.R",local=T)$value 
 }
-
 
 # Load UI and server controls
 shinyApp(ui = ui, server = server)
