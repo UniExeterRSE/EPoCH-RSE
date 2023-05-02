@@ -7,9 +7,7 @@ library(shinyTree)
 library(RColorBrewer)
 library(stringr)
 
-set.seed(67483)
-ncols <- 190
-expanded_dark2 <- sample(colorRampPalette(brewer.pal(8, "Dark2"))(ncols))
+graph_colours = "Dark2"
 
 # Introduce a function to allow horizontal line plotting in plot_ly
 hline <- function(y = 0, colour = "#898989") {
@@ -23,8 +21,9 @@ hline <- function(y = 0, colour = "#898989") {
 create_exposure_manhattan_plotly <- function(df, height){
   adj_pthreshold <- 0.05/nrow(df)
   df %>%
-    plot_ly(height = height) %>% 
-    add_markers(x = ~jitter(as.numeric(exposure_subclass_time_dose)), y =~-log10(p), color = ~exposure_subclass_time_dose,
+    plot_ly(height = height, colors = graph_colours) %>% 
+    add_markers(x = ~jitter(as.numeric(exposure_subclass_time_dose)), y =~-log10(p),
+                color = ~as.character(exposure_subclass_time_dose),
                 marker = list(size = 6), alpha=0.5,
                 hoverinfo = "text",
                 text = ~paste0("Exposure class: ",exposure_class,
@@ -42,7 +41,7 @@ create_exposure_manhattan_plotly <- function(df, height){
 create_hl_exposure_manhattan_plotly <- function(df, height){
   adj_pthreshold <- 0.05/nrow(df)
   df %>%
-    plot_ly(height = height) %>% 
+    plot_ly(height = height, colors = graph_colours) %>% 
     add_markers(x = ~jitter(as.numeric(as.factor(exposure_class))), y =~-log10(p), color = ~exposure_class,
                 marker = list(size = 6), alpha=0.5,
                 hoverinfo = "text",
@@ -61,8 +60,9 @@ create_hl_exposure_manhattan_plotly <- function(df, height){
 create_outcome_manhattan_plotly <- function(df, height){
   adj_pthreshold <- 0.05/nrow(df)
   df %>%
-    plot_ly(height = height) %>% 
-    add_markers(x = ~jitter(as.numeric(outcome_subclass_time)), y =~-log10(p), color = ~outcome_subclass_time,
+    plot_ly(height = height, colors = graph_colours) %>%   
+    add_markers(x = ~jitter(as.numeric(outcome_subclass_time)), y =~-log10(p),
+                color = ~as.character(outcome_subclass_time),
                 marker = list(size = 6), alpha=0.5,
                 hoverinfo = "text",
                 text = ~paste0("Exposure class: ",exposure_class,
@@ -80,7 +80,7 @@ create_outcome_manhattan_plotly <- function(df, height){
 create_hl_outcome_manhattan_plotly <- function(df, height){
   adj_pthreshold <- 0.05/nrow(df)
   df %>%
-    plot_ly(height = height) %>% 
+    plot_ly(height = height, colors=graph_colours) %>% 
     add_markers(x = ~jitter(as.numeric(as.factor(outcome_class))), y =~-log10(p), color = ~outcome_class,
                 marker = list(size = 6), alpha=0.5,
                 hoverinfo = "text",
@@ -99,7 +99,7 @@ create_hl_outcome_manhattan_plotly <- function(df, height){
 create_exposure_box_plotly <- function(df){
   adj_pthreshold <- 0.05/nrow(df)
   df %>%
-    plot_ly(height = 600) %>% 
+    plot_ly(height = 600, colors=graph_colours) %>% 
     add_trace(x = ~as.numeric(exposure_subclass_time_dose),y = ~-log10(p), color = ~exposure_subclass_time_dose,
               type = "box", 
               hoverinfo = "text",
@@ -120,8 +120,9 @@ create_volcano_plot <- function(df){
   adj_pthreshold <- 0.05/nrow(df)
   adj_pthreshold_rank <- rank(-log10(df$p))[which.min(abs(df$p-adj_pthreshold))]-1
 
-  df %>%
-    plot_ly(height = 540) %>%
+  ttext <- str_to_sentence(unique(df$person_exposed))
+  p <- df %>%
+    plot_ly(height = 540, colors=graph_colours) %>%
     add_markers(x = ~est_SDM,y = ~rank(-log10(p)), color = ~outcome_class,
               marker = list(size = 6), alpha=0.5,
               hoverinfo = "text",
@@ -130,9 +131,20 @@ create_volcano_plot <- function(df){
                              "<br>Outcome: ",outcome_subclass_time,
                              "<br>p value: ",p),
               showlegend = FALSE) %>% 
+    add_annotations(text = ttext,
+                    x = 0.5,
+                    y = 1,
+                    yref = "paper",
+                    xref = "paper",
+                    xanchor = "middle",
+                    yanchor = "top",
+                    showarrow = FALSE) %>%
     layout(xaxis = list(title = "Standardised effect estimate",
                         range = list(-0.75, 0.75)),
-           yaxis = list(title = "Ranked -log10(P)"))
+           yaxis = list(title = "Ranked -log10(P)",
+                        rangemode = "tozero"))
+
+    p
 }
 
 
@@ -147,7 +159,7 @@ create_exposure_volcano_plot <- function(df){
     geom_point(aes(colour=outcome_class),size=0.5,alpha=0.5)+
     geom_vline(xintercept = 0,colour="grey40")+
     theme_classic()+
-    scale_colour_brewer(palette = "Dark2")+
+    scale_colour_brewer(palette = graph_colours)+
     xlab("Standardised effect estimate")+
     ylab("Ranked -log10(P)")+
     facet_grid(.~person_exposed)+  
@@ -170,7 +182,7 @@ create_outcome_volcano_plot <- function(df){
     geom_point(aes(colour=exposure_class),size=0.5,alpha=0.5)+
     geom_vline(xintercept = 0,colour="grey40")+
     theme_classic()+
-    scale_colour_brewer(palette = "Dark2")+
+    scale_colour_brewer(palette = graph_colours)+
     xlab("Standardised effect estimate")+
     ylab("Ranked -log10(P)")+
     facet_grid(.~person_exposed)+  

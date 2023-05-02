@@ -38,7 +38,7 @@ ui <- function(request) {
                                 });
                             ')),
                         # Logo
-                        tags$img(src="https://cpb-eu-w2.wpmucdn.com/blogs.bristol.ac.uk/dist/c/500/files/2018/11/Untitled-26hzp4l.png",
+                        tags$img(src="./app_logo.png",
                                       width = 180, height = 50, label = tags$h4("logo")),
                         hr(),
                         actionButton("load_results","Click to load results"),
@@ -63,13 +63,6 @@ ui <- function(request) {
                                        options = list(placeholder = '----------', maxItems = 1)),
                         hr(),
                         actionButton("plot_data","Visualise data"),
-                        #hr(),
-                        #selectizeInput(inputId = "future_loader",
-                        #               label = tags$h4("Placeholder for future data loader:"),
-                        #               choices = NULL,
-                        #               selected = NULL,
-                        #               multiple = T,
-                        #               options = list(placeholder = '----------', maxItems = 1)),
                         hr(),
                         p('Footer text', style = "font-size: 85%"),
                         br()),
@@ -80,7 +73,7 @@ ui <- function(request) {
                                          tabsetPanel(
                                                 tabPanel("Manhattan", icon = icon("chart-simple"),
                                                     textOutput('Text1'),
-                                                    plotlyOutput("exposureManhattanPlot")
+                                                    plotlyOutput("exposureManhattanPlot", height="100%")
                                                         ),
                                                 tabPanel("Volcano",
                                                     plotlyOutput("exposureVolcanoPlot")

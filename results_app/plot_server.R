@@ -42,7 +42,12 @@ observeEvent(input$plot_data,{
     dat <- global_data$data$all_res[which(global_data$data$all_res$model==model),]
     exp_df <- create_exposure_dfs(tolower(input$exposure_choice),dat)
     filtered_df <- create_outcome_dfs(tolower(input$outcome_choice),exp_df)
-    create_volcano_plot(filtered_df)
+    p_m <- create_volcano_plot(filter(filtered_df, person_exposed=="mother"))
+    p_f <- create_volcano_plot(filter(filtered_df, person_exposed=="father"))
+    subplot(p_m, p_f, shareY = TRUE, titleX = TRUE)%>%
+      layout(xaxis = list(title = "Standardised effect estimate",
+                         range = list(-0.75, 0.75)),
+             yaxis = list(title = "Ranked -log10(P)"))
     })
 
   output$outcomeVolcanoPlot <- renderPlotly({
@@ -50,7 +55,12 @@ observeEvent(input$plot_data,{
     dat <- global_data$data$all_res[which(global_data$data$all_res$model==model),]
     outc_df <- create_outcome_dfs(tolower(input$outcome_choice),dat)
     filtered_df <- create_exposure_dfs(tolower(input$exposure_choice),outc_df)
-    create_volcano_plot(filtered_df)
+    p_m <- create_volcano_plot(filter(filtered_df, person_exposed=="mother"))
+    p_f <- create_volcano_plot(filter(filtered_df, person_exposed=="father"))
+    subplot(p_m, p_f, shareY = TRUE, titleX = TRUE)%>%
+      layout(xaxis = list(title = "Standardised effect estimate",
+                         range = list(-0.75, 0.75)),
+             yaxis = list(title = "Ranked -log10(P)"))
     })
 
   }
