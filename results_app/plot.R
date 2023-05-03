@@ -28,7 +28,8 @@ create_exposure_manhattan_plotly <- function(df, height){
                 hoverinfo = "text",
                 text = ~paste0("Exposure class: ",exposure_class,
                                "<br>Exposure type: ",exposure_subclass_time_dose,
-                               "<br>Outcome: ",outcome_subclass_time,
+                               "<br>Outcome class: ",outcome_class,
+                             "<br>Outcome type: ",outcome_subclass_time,
                                "<br>p value: ",p),
                 showlegend = FALSE) %>% 
     layout(shapes = list(hline(-log10(adj_pthreshold))),
@@ -47,11 +48,12 @@ create_hl_exposure_manhattan_plotly <- function(df, height){
                 hoverinfo = "text",
                 text = ~paste0("Exposure class: ",exposure_class,
                                "<br>Exposure type: ",exposure_subclass_time_dose,
-                               "<br>Outcome: ",outcome_subclass_time,
+                               "<br>Outcome class: ",outcome_class,
+                             "<br>Outcome type: ",outcome_subclass_time,
                                "<br>p value: ",p),
                 showlegend = FALSE) %>% 
     layout(shapes = list(hline(-log10(adj_pthreshold))),
-           xaxis = list(title = "Exposure type",
+           xaxis = list(title = "Exposure class",
                         ticktext = ~str_to_sentence(exposure_class),
                         tickvals = ~as.numeric(as.factor(exposure_class)),
                         tickmode = "array"))
@@ -67,11 +69,12 @@ create_outcome_manhattan_plotly <- function(df, height){
                 hoverinfo = "text",
                 text = ~paste0("Exposure class: ",exposure_class,
                                "<br>Exposure type: ",exposure_subclass_time_dose,
-                               "<br>Outcome: ",outcome_subclass_time,
+                               "<br>Outcome class: ",outcome_class,
+                             "<br>Outcome type: ",outcome_subclass_time,
                                "<br>p value: ",p),
                 showlegend = FALSE) %>% 
     layout(shapes = list(hline(-log10(adj_pthreshold))),
-           xaxis = list(title = "Outcome",
+           xaxis = list(title = "Outcome type",
                         ticktext = ~str_to_sentence(outcome_subclass_time),
                         tickvals = ~as.numeric(outcome_subclass_time),
                         tickmode = "array"))
@@ -86,11 +89,12 @@ create_hl_outcome_manhattan_plotly <- function(df, height){
                 hoverinfo = "text",
                 text = ~paste0("Exposure class: ",exposure_class,
                                "<br>Exposure type: ",exposure_subclass_time_dose,
-                               "<br>Outcome: ",outcome_subclass_time,
+                               "<br>Outcome class: ",outcome_class,
+                             "<br>Outcome type: ",outcome_subclass_time,
                                "<br>p value: ",p),
                 showlegend = FALSE) %>% 
     layout(shapes = list(hline(-log10(adj_pthreshold))),
-           xaxis = list(title = "Outcome",
+           xaxis = list(title = "Outcome class",
                         ticktext = ~str_to_sentence(outcome_class),
                         tickvals = ~as.numeric(as.factor(outcome_class)),
                         tickmode = "array"))
@@ -105,7 +109,8 @@ create_exposure_box_plotly <- function(df){
               hoverinfo = "text",
               text = ~paste0("Exposure class: ",exposure_class,
                              "<br>Exposure type: ",exposure_subclass_time_dose,
-                             "<br>Outcome: ",outcome_subclass_time,
+                             "<br>Outcome class: ",outcome_class,
+                             "<br>Outcome type: ",outcome_subclass_time,
                              "<br>p value: ",p),
               showlegend = FALSE) %>%
     layout(shapes = list(hline(-log10(adj_pthreshold))),
@@ -121,14 +126,15 @@ create_volcano_plot <- function(df){
   adj_pthreshold_rank <- rank(-log10(df$p))[which.min(abs(df$p-adj_pthreshold))]-1
 
   ttext <- str_to_sentence(unique(df$person_exposed))
-  p <- df %>%
+  df %>%
     plot_ly(height = 540, colors=graph_colours) %>%
     add_markers(x = ~est_SDM,y = ~rank(-log10(p)), color = ~outcome_class,
               marker = list(size = 6), alpha=0.5,
               hoverinfo = "text",
               text = ~paste0("Exposure class: ",exposure_class,
                              "<br>Exposure type: ",exposure_subclass_time_dose,
-                             "<br>Outcome: ",outcome_subclass_time,
+                             "<br>Outcome class: ",outcome_class,
+                             "<br>Outcome type: ",outcome_subclass_time,
                              "<br>p value: ",p),
               showlegend = FALSE) %>% 
     add_annotations(text = ttext,
@@ -136,15 +142,13 @@ create_volcano_plot <- function(df){
                     y = 1,
                     yref = "paper",
                     xref = "paper",
-                    xanchor = "middle",
+                    xanchor = "left",
                     yanchor = "top",
                     showarrow = FALSE) %>%
     layout(xaxis = list(title = "Standardised effect estimate",
                         range = list(-0.75, 0.75)),
            yaxis = list(title = "Ranked -log10(P)",
                         rangemode = "tozero"))
-
-    p
 }
 
 

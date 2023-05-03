@@ -1,6 +1,7 @@
 
 # Load required packages -------------------------------
 library(shiny)
+library(shinyjs)
 library(tidyverse)
 library(plotly)
 library(shinycssloaders)
@@ -10,11 +11,6 @@ library(bslib)
 
 source("data.R")
 source("plot.R")
-
-# Hard coded choices for comparisons
-exposures <- list("All", "Smoking", "Alcohol consumption", "Caffeine consumption", "Socioeconomic position", "Physical activity", "Diet")
-outcomes <- list("All", "Perinatal survival", "Immunological", "Body size and composition", "Psychosocial and cognitive", "Serum biomarkers", "Negative control outcomes", "Blood pressure")
-models <- list("Model 1a", "Model 1b")
 
 ui <- function(request) {
         fluidPage(title = "EPoCH data analysis tool", id = 'epoch',
@@ -38,34 +34,37 @@ ui <- function(request) {
                                 });
                             ')),
                         # Logo
-                        tags$img(src="./app_logo.png",
-                                      width = 180, height = 50, label = tags$h4("logo")),
+                        tags$img(src="https://raw.githubusercontent.com/UniExeterRSE/EPoCH-RSE/main/results_app/app_logo.png",
+                                      width = 185, height = 60, label = tags$h4("logo")),
                         hr(),
                         actionButton("load_results","Click to load results"),
                         hr(),
                         selectizeInput(inputId = "exposure_choice",
                                        label = tags$h4("Exposure type:"),
-                                       choices = exposures,
+                                       choices = NULL,
                                        selected = NULL,
                                        multiple = T,
                                        options = list(placeholder = '----------', maxItems = 1)),
                         selectizeInput(inputId = "outcome_choice",
                                        label = tags$h4("Outcome:"),
-                                       choices = outcomes,
+                                       choices = NULL,
                                        selected = NULL,
                                        multiple = T,
                                        options = list(placeholder = '----------', maxItems = 1)),
                         selectizeInput(inputId = "model_choice",
                                        label = tags$h4("Model:"),
-                                       choices = models,
+                                       choices = NULL,
                                        selected = NULL,
                                        multiple = T,
                                        options = list(placeholder = '----------', maxItems = 1)),
                         hr(),
                         actionButton("plot_data","Visualise data"),
                         hr(),
-                        p('Footer text', style = "font-size: 85%"),
-                        br()),
+                        p(HTML("<p>The Exploring Prenatal influences on Childhood Health, or EPoCH, project investigates how parents’
+                                lifestyles in the important prenatal period might affect the health of their children. Please check out
+                                the <a href='https://epoch.blogs.bristol.ac.uk'>EPoCH website</a> for more information. </p>"),
+                          style = "font-size: 85%")
+                        ),
                 # Output of Plot, Data, and Summary -------------------------------
                 mainPanel( width = 9,
                         tabsetPanel(id = 'main_tabs',
@@ -96,11 +95,7 @@ ui <- function(request) {
                                 tabPanel("Saved plots", icon = icon("save"))
                                     )
                             )
-                      ),
-        # Footer -------------------------------
-        #tags$br(),
-        #hr(),
-        #p('Footer text', style = "font-size: 85%")
+                      )
 )
 }
 

@@ -15,7 +15,7 @@ observeEvent(input$plot_data,{
 
     exp_df <- create_exposure_dfs(tolower(input$exposure_choice),dat)
     filtered_df <- create_outcome_dfs(tolower(input$outcome_choice),exp_df)
-    if (input$exposure_choice == "All" && input$outcome_choice == "All") {
+    if (input$exposure_choice == "All") {
       create_hl_exposure_manhattan_plotly(filtered_df, input$dimension[2]-110)
     } else {
       create_exposure_manhattan_plotly(filtered_df, input$dimension[2]-110)
@@ -28,9 +28,7 @@ observeEvent(input$plot_data,{
 
     outc_df <- create_outcome_dfs(tolower(input$outcome_choice),dat)
     filtered_df <- create_exposure_dfs(tolower(input$exposure_choice),outc_df)
-    if (input$outcome_choice == "All" && input$exposure_choice == "All") {
-      print(filtered_df)
-      print(input$dimension[2]-110)
+    if (input$outcome_choice == "All") {
       create_hl_outcome_manhattan_plotly(filtered_df, input$dimension[2]-110)
     } else {
       create_outcome_manhattan_plotly(filtered_df, input$dimension[2]-110)
