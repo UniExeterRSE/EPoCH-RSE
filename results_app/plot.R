@@ -40,7 +40,8 @@ create_exposure_manhattan_plotly <- function(df, height){
            xaxis = list(title = "Exposure type",
                         ticktext = ~str_to_sentence(exposure_subclass_time_dose),
                         tickvals = ~as.numeric(exposure_subclass_time_dose),
-                        tickmode = "array"))
+                        tickmode = "array")) %>%
+    config(toImageButtonOptions = list(format = "png", scale = 5))
 }
 
 create_hl_exposure_manhattan_plotly <- function(df, height){
@@ -63,7 +64,8 @@ create_hl_exposure_manhattan_plotly <- function(df, height){
            xaxis = list(title = "Exposure class",
                         ticktext = ~str_to_sentence(exposure_class),
                         tickvals = ~as.numeric(as.factor(exposure_class)),
-                        tickmode = "array"))
+                        tickmode = "array")) %>%
+    config(toImageButtonOptions = list(format = "png", scale = 5))
 }
 
 create_outcome_manhattan_plotly <- function(df, height){
@@ -89,7 +91,8 @@ create_outcome_manhattan_plotly <- function(df, height){
            xaxis = list(title = "Outcome type",
                         ticktext = ~str_to_sentence(outcome_subclass_time),
                         tickvals = ~as.numeric(outcome_subclass_time),
-                        tickmode = "array"))
+                        tickmode = "array")) %>%
+    config(toImageButtonOptions = list(format = "png", scale = 5))
 }
 
 create_hl_outcome_manhattan_plotly <- function(df, height){
@@ -112,7 +115,8 @@ create_hl_outcome_manhattan_plotly <- function(df, height){
            xaxis = list(title = "Outcome class",
                         ticktext = ~str_to_sentence(outcome_class),
                         tickvals = ~as.numeric(as.factor(outcome_class)),
-                        tickmode = "array"))
+                        tickmode = "array")) %>%
+    config(toImageButtonOptions = list(format = "png", scale = 5))
 }
 
 create_exposure_box_plotly <- function(df){
@@ -135,7 +139,8 @@ create_exposure_box_plotly <- function(df){
            xaxis = list(title = "Exposure type",
                         ticktext = ~str_to_sentence(exposure_subclass_time_dose),
                         tickvals = ~as.numeric(exposure_subclass_time_dose),
-                        tickmode = "array"))
+                        tickmode = "array")) %>%
+    config(toImageButtonOptions = list(format = "png", scale = 5))
 }
 
 create_volcano_plot <- function(df){
@@ -169,7 +174,8 @@ create_volcano_plot <- function(df){
     layout(xaxis = list(title = "Standardised effect estimate",
                         range = list(-0.75, 0.75)),
            yaxis = list(title = "Ranked -log10(P)",
-                        rangemode = "tozero"))
+                        rangemode = "tozero")) %>%
+    config(toImageButtonOptions = list(format = "png", scale = 5))
 }
 
 

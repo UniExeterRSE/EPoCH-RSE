@@ -39,7 +39,7 @@ import_data_local <- function(global_data){
   return(imported_data)
 }
 
-create_exposure_dfs <- function(exposureclass,dat){
+create_exposure_dfs <- function(exposureclass, dat){
 
   if (exposureclass == "all") {
     df <- dat[dat$person_exposed!="child",]
@@ -62,7 +62,7 @@ create_exposure_dfs <- function(exposureclass,dat){
   df
 }
 
-create_outcome_dfs <- function(outcomeclass,dat){
+create_outcome_dfs <- function(outcomeclass, dat){
 
   if (outcomeclass == "all") {
     df <- dat[dat$person_exposed!="child",]
