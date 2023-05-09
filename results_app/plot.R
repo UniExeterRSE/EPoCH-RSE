@@ -17,6 +17,24 @@ hline <- function(y = 0, colour = "#898989") {
   )
 }
 
+parent_filters <- list(
+  list(
+    active = -1,
+    type = 'buttons',
+    buttons = list(
+      list(label = "Mother",
+           method = "update",
+           args = list(list(visible = c(TRUE, FALSE)))),
+      list(label = "Father",
+           method = "update",
+           args = list(list(visible = c(FALSE, TRUE)))),
+      list(label = "Both",
+           method = "update",
+           args = list(list(visible = c(TRUE))))
+    )
+  )
+)
+
 
 create_exposure_manhattan_plotly <- function(df, height){
   adj_pthreshold <- 0.05/nrow(df)
@@ -40,7 +58,8 @@ create_exposure_manhattan_plotly <- function(df, height){
            xaxis = list(title = "Exposure type",
                         ticktext = ~str_to_sentence(exposure_subclass_time_dose),
                         tickvals = ~as.numeric(exposure_subclass_time_dose),
-                        tickmode = "array")) %>%
+                        tickmode = "array"),
+          updatemenus = parent_filters) %>%
     config(toImageButtonOptions = list(format = "png", scale = 5))
 }
 
