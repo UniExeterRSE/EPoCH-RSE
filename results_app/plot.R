@@ -17,49 +17,58 @@ hline <- function(y = 0, colour = "#898989") {
   )
 }
 
-parent_filters <- list(
-  list(
-    active = -1,
-    type = 'buttons',
-    buttons = list(
-      list(label = "Mother",
-           method = "update",
-           args = list(list(visible = c(TRUE, FALSE)))),
-      list(label = "Father",
-           method = "update",
-           args = list(list(visible = c(FALSE, TRUE)))),
-      list(label = "Both",
-           method = "update",
-           args = list(list(visible = c(TRUE))))
-    )
-  )
-)
-
+plot_df_manhattan <- function(fig, df, label){
+  lmap <- length(unique(df$exposure_subclass_time_dose))
+  fig <- fig %>%
+    add_markers(name = label, x = jitter(as.numeric(df$exposure_subclass_time_dose), amount=0.3), y =-log10(df$p),
+                color = as.character(df$exposure_subclass_time_dose),
+                marker = list(size = 6), alpha=0.5,
+                hoverinfo = "text",
+                text = paste0("<b>Exposure class</b>: ",df$exposure_class,
+                               "<br><b>Exposure type</b>: ",df$exposure_subclass_time_dose,
+                               "<br><b>Outcome class</b>: ",df$outcome_class,
+                               "<br><b>Outcome type</b>: ",df$outcome_subclass_time,
+                               "<br><b>Cohorts</b>: ",df$cohorts,
+                               "<br><b>Parent Exposed</b>: ",df$person_exposed,
+                               "<br><b>Total N</b>: ",df$total_n,
+                               "<br><b>Estimate</b>: ",df$est,
+                               "<br><b>p value</b>: ",df$p),
+                showlegend = FALSE)
+}
 
 create_exposure_manhattan_plotly <- function(df, height){
   adj_pthreshold <- 0.05/nrow(df)
-  print
-  df %>%
-    plot_ly(height = height, colors = graph_colours) %>% 
-    add_markers(x = ~jitter(as.numeric(exposure_subclass_time_dose), amount=0.3), y =~-log10(p),
-                color = ~as.character(exposure_subclass_time_dose),
-                marker = list(size = 6), alpha=0.5,
-                hoverinfo = "text",
-                text = ~paste0("<b>Exposure class</b>: ",exposure_class,
-                               "<br><b>Exposure type</b>: ",exposure_subclass_time_dose,
-                               "<br><b>Outcome class</b>: ",outcome_class,
-                               "<br><b>Outcome type</b>: ",outcome_subclass_time,
-                               "<br><b>Cohorts</b>: ",cohorts,
-                               "<br><b>Total N</b>: ",total_n,
-                               "<br><b>Estimate</b>: ",est,
-                               "<br><b>p value</b>: ",p),
-                showlegend = FALSE) %>% 
-    layout(shapes = list(hline(-log10(adj_pthreshold))),
-           xaxis = list(title = "Exposure type",
-                        ticktext = ~str_to_sentence(exposure_subclass_time_dose),
-                        tickvals = ~as.numeric(exposure_subclass_time_dose),
-                        tickmode = "array"),
-          updatemenus = parent_filters) %>%
+  df_mother <- df[df$person_exposed=="mother",]
+  df_father <- df[df$person_exposed=="father",]
+  fig <- plot_ly(height = height, colors = graph_colours)
+  fig <- plot_df_manhattan(fig, df_mother, label="Mother")
+  fig <- plot_df_manhattan(fig, df_father, label="Father")
+  lmap_mother <- length(unique(df_mother$exposure_subclass_time_dose))
+  lmap_father <- length(unique(df_father$exposure_subclass_time_dose))
+  fig <- fig %>% layout(shapes = list(hline(-log10(adj_pthreshold))),
+                        xaxis = list(title = "Exposure type",
+                                     ticktext = str_to_sentence(df$exposure_subclass_time_dose),
+                                     tickvals = as.numeric(df$exposure_subclass_time_dose),
+                                     tickmode = "array"),
+                        updatemenus = list(
+                                    list(
+                                      active = -1,
+                                      type = 'buttons',
+                                      buttons = list(
+                                        list(label = "Mother",
+                                             method = "update",
+                                             args = list(list(visible = c(rep(TRUE,lmap_mother), rep(FALSE,lmap_father))))),
+                                        list(label = "Father",
+                                             method = "update",
+                                             args = list(list(visible = c(rep(FALSE,lmap_mother), rep(TRUE,lmap_father))))),
+                                        list(label = "Both",
+                                             method = "update",
+                                             args = list(list(visible = c(TRUE))))
+                                      )
+                                    )
+                                  )
+
+                        ) %>%
     config(toImageButtonOptions = list(format = "png", scale = 5))
 }
 
