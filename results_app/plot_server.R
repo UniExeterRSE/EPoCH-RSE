@@ -16,9 +16,11 @@ observeEvent(input$plot_data,{
     exp_df <- create_exposure_dfs(tolower(input$exposure_choice),dat)
     filtered_df <- create_outcome_dfs(tolower(input$outcome_choice),exp_df)
     if (input$exposure_choice == "All") {
-      create_hl_exposure_manhattan_plotly(filtered_df, input$dimension[2]-110)
+      create_manhattan_plot(filtered_df, input$dimension[2]-110,
+                            "exposure_class", "Exposure class")
     } else {
-      create_exposure_manhattan_plotly(filtered_df, input$dimension[2]-110)
+      create_manhattan_plot(filtered_df, input$dimension[2]-110,
+                            "exposure_subclass_time_dose", "Exposure type")
     }
     })
 
@@ -29,9 +31,11 @@ observeEvent(input$plot_data,{
     outc_df <- create_outcome_dfs(tolower(input$outcome_choice),dat)
     filtered_df <- create_exposure_dfs(tolower(input$exposure_choice),outc_df)
     if (input$outcome_choice == "All") {
-      create_hl_outcome_manhattan_plotly(filtered_df, input$dimension[2]-110)
+      create_manhattan_plot(filtered_df, input$dimension[2]-110,
+                            "outcome_class", "Outcome class")
     } else {
-      create_outcome_manhattan_plotly(filtered_df, input$dimension[2]-110)
+      create_manhattan_plot(filtered_df, input$dimension[2]-110,
+                            "outcome_subclass_time", "Outcome type")
     }
     })
 

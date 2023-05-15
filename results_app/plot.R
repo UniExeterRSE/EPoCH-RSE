@@ -17,11 +17,10 @@ hline <- function(y = 0, colour = "#898989") {
   )
 }
 
-plot_df_manhattan <- function(fig, df, label){
-  lmap <- length(unique(df$exposure_subclass_time_dose))
+plot_df_manhattan <- function(fig, df, x_data, label){
   fig <- fig %>%
-    add_markers(name = label, x = jitter(as.numeric(df$exposure_subclass_time_dose), amount=0.3), y =-log10(df$p),
-                color = as.character(df$exposure_subclass_time_dose),
+    add_markers(name = label, x = jitter(as.numeric(as.factor(df[[x_data]])), amount=0.3), y =-log10(df$p),
+                color = as.character(df[[x_data]]),
                 marker = list(size = 6), alpha=0.5,
                 hoverinfo = "text",
                 text = paste0("<b>Exposure class</b>: ",df$exposure_class,
@@ -36,19 +35,19 @@ plot_df_manhattan <- function(fig, df, label){
                 showlegend = FALSE)
 }
 
-create_exposure_manhattan_plotly <- function(df, height){
+create_manhattan_plot <- function(df, height, x_data, x_label){
   adj_pthreshold <- 0.05/nrow(df)
   df_mother <- df[df$person_exposed=="mother",]
   df_father <- df[df$person_exposed=="father",]
   fig <- plot_ly(height = height, colors = graph_colours)
-  fig <- plot_df_manhattan(fig, df_mother, label="Mother")
-  fig <- plot_df_manhattan(fig, df_father, label="Father")
-  lmap_mother <- length(unique(df_mother$exposure_subclass_time_dose))
-  lmap_father <- length(unique(df_father$exposure_subclass_time_dose))
+  fig <- plot_df_manhattan(fig, df_mother, x_data, label="Mother")
+  fig <- plot_df_manhattan(fig, df_father, x_data, label="Father")
+  lmap_mother <- length(unique(df_mother[[x_data]]))
+  lmap_father <- length(unique(df_father[[x_data]]))
   fig <- fig %>% layout(shapes = list(hline(-log10(adj_pthreshold))),
-                        xaxis = list(title = "Exposure type",
-                                     ticktext = str_to_sentence(df$exposure_subclass_time_dose),
-                                     tickvals = as.numeric(df$exposure_subclass_time_dose),
+                        xaxis = list(title = x_label,
+                                     ticktext = str_to_sentence(unique(df[[x_data]])),
+                                     tickvals = unique(as.numeric(as.factor(df[[x_data]]))),
                                      tickmode = "array"),
                         updatemenus = list(
                                     list(
@@ -69,81 +68,6 @@ create_exposure_manhattan_plotly <- function(df, height){
                                   )
 
                         ) %>%
-    config(toImageButtonOptions = list(format = "png", scale = 5))
-}
-
-create_hl_exposure_manhattan_plotly <- function(df, height){
-  adj_pthreshold <- 0.05/nrow(df)
-  df %>%
-    plot_ly(height = height, colors = graph_colours) %>% 
-    add_markers(x = ~jitter(as.numeric(as.factor(exposure_class)), amount=0.3), y =~-log10(p), color = ~exposure_class,
-                marker = list(size = 6), alpha=0.5,
-                hoverinfo = "text",
-                text = ~paste0("<b>Exposure class</b>: ",exposure_class,
-                               "<br><b>Exposure type</b>: ",exposure_subclass_time_dose,
-                               "<br><b>Outcome class</b>: ",outcome_class,
-                               "<br><b>Outcome type</b>: ",outcome_subclass_time,
-                               "<br><b>Cohorts</b>: ",cohorts,
-                               "<br><b>Total N</b>: ",total_n,
-                               "<br><b>Estimate</b>: ",est,
-                               "<br><b>p value</b>: ",p),
-                showlegend = FALSE) %>% 
-    layout(shapes = list(hline(-log10(adj_pthreshold))),
-           xaxis = list(title = "Exposure class",
-                        ticktext = ~str_to_sentence(exposure_class),
-                        tickvals = ~as.numeric(as.factor(exposure_class)),
-                        tickmode = "array")) %>%
-    config(toImageButtonOptions = list(format = "png", scale = 5))
-}
-
-create_outcome_manhattan_plotly <- function(df, height){
-  adj_pthreshold <- 0.05/nrow(df)
-  print(df)
-  print(as.numeric(unique(df$outcome_subclass_time)))
-  df %>%
-    plot_ly(height = height, colors = graph_colours) %>%   
-    add_markers(x = ~jitter(as.numeric(outcome_subclass_time)), y =~-log10(p),
-                color = ~as.character(outcome_subclass_time),
-                marker = list(size = 6), alpha=0.5,
-                hoverinfo = "text",
-                text = ~paste0("<b>Exposure class</b>: ",exposure_class,
-                               "<br><b>Exposure type</b>: ",exposure_subclass_time_dose,
-                               "<br><b>Outcome class</b>: ",outcome_class,
-                               "<br><b>Outcome type</b>: ",outcome_subclass_time,
-                               "<br><b>Cohorts</b>: ",cohorts,
-                               "<br><b>Total N</b>: ",total_n,
-                               "<br><b>Estimate</b>: ",est,
-                               "<br><b>p value</b>: ",p),
-                showlegend = FALSE) %>% 
-    layout(shapes = list(hline(-log10(adj_pthreshold))),
-           xaxis = list(title = "Outcome type",
-                        ticktext = ~str_to_sentence(outcome_subclass_time),
-                        tickvals = ~as.numeric(outcome_subclass_time),
-                        tickmode = "array")) %>%
-    config(toImageButtonOptions = list(format = "png", scale = 5))
-}
-
-create_hl_outcome_manhattan_plotly <- function(df, height){
-  adj_pthreshold <- 0.05/nrow(df)
-  df %>%
-    plot_ly(height = height, colors=graph_colours) %>% 
-    add_markers(x = ~jitter(as.numeric(as.factor(outcome_class))), y =~-log10(p), color = ~outcome_class,
-                marker = list(size = 6), alpha=0.5,
-                hoverinfo = "text",
-                text = ~paste0("<b>Exposure class</b>: ",exposure_class,
-                               "<br><b>Exposure type</b>: ",exposure_subclass_time_dose,
-                               "<br><b>Outcome class</b>: ",outcome_class,
-                               "<br><b>Outcome type</b>: ",outcome_subclass_time,
-                               "<br><b>Cohorts</b>: ",cohorts,
-                               "<br><b>Total N</b>: ",total_n,
-                               "<br><b>Estimate</b>: ",est,
-                               "<br><b>p value</b>: ",p),
-                showlegend = FALSE) %>% 
-    layout(shapes = list(hline(-log10(adj_pthreshold))),
-           xaxis = list(title = "Outcome class",
-                        ticktext = ~str_to_sentence(outcome_class),
-                        tickvals = ~as.numeric(as.factor(outcome_class)),
-                        tickmode = "array")) %>%
     config(toImageButtonOptions = list(format = "png", scale = 5))
 }
 
