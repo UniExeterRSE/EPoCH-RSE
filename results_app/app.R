@@ -91,35 +91,40 @@ ui <- function(request) {
                                                   )
                                          ),
                                 tabPanel("Plot by exposure coefficient", icon = icon("chart-simple"),
-                                         selectizeInput(inputId = "coeff_person",
-                                                        label = tags$h4("Person exposed:"),
-                                                        choices = NULL,
-                                                        selected = NULL,
-                                                        multiple = T,
-                                                        options = list(placeholder = '----------', maxItems = 1)),
-                                         selectizeInput(inputId = "coeff_exptime",
-                                                        label = tags$h4("Exposure time:"),
-                                                        choices = NULL,
-                                                        selected = NULL,
-                                                        multiple = T,
-                                                        options = list(placeholder = '----------', maxItems = 1)),
-                                         selectizeInput(inputId = "coeff_explevel",
-                                                        label = tags$h4("Exposure level:"),
-                                                        choices = NULL,
-                                                        selected = NULL,
-                                                        multiple = T,
-                                                        options = list(placeholder = '----------', maxItems = 1)),
-                                         selectizeInput(inputId = "coeff_reporting",
-                                                        label = tags$h4("Reporting:"),
-                                                        choices = NULL,
-                                                        selected = NULL,
-                                                        multiple = T,
-                                                        options = list(placeholder = '----------', maxItems = 1))
-                                                        ),
+                                    tabsetPanel(
+                                        tabPanel("Select comparisons",
+                                            selectizeInput(inputId = "coeff_person",
+                                                           label = tags$h4("Person exposed:"),
+                                                           choices = NULL,
+                                                           selected = NULL,
+                                                           multiple = T,
+                                                           options = list(placeholder = '----------', maxItems = 1)),
+                                            selectizeInput(inputId = "coeff_subclass",
+                                                           label = tags$h4("Exposure level:"),
+                                                           choices = NULL,
+                                                           selected = NULL,
+                                                           multiple = T,
+                                                           options = list(placeholder = '----------', maxItems = 1)),
+                                            selectizeInput(inputId = "coeff_exptime",
+                                                           label = tags$h4("Exposure time:"),
+                                                           choices = NULL,
+                                                           selected = NULL,
+                                                           multiple = T,
+                                                           options = list(placeholder = '----------', maxItems = 1)),
+                                            selectizeInput(inputId = "coeff_explink",
+                                                           label = tags$h4("Exposure linker:"),
+                                                           choices = NULL,
+                                                           selected = NULL,
+                                                           multiple = T,
+                                                           options = list(placeholder = '----------', maxItems = 1)),
+                                            hr(),
+                                            actionButton("add_comp","Add comparison"))
+                                        )),
                                 tabPanel("Forest plots", icon = icon("chart-simple"),
                                          plotlyOutput("forestPlot")),
                                 tabPanel("Saved plots", icon = icon("save"))
                                     )
+                                
                             )
                       )
 )
@@ -127,7 +132,8 @@ ui <- function(request) {
 
 server <- function(input, output, session) {
 
-  global_data <- reactiveValues(data = NULL, data_is_loaded = FALSE)
+  global_data <- reactiveValues(data = NULL, data_is_loaded = FALSE,
+                                coeff_outcome_linkers = NULL)
 
   source("data_server.R",local=T)$value
   source("plot_server.R",local=T)$value

@@ -114,7 +114,7 @@ create_volcano_plot <- function(df){
                              "<br><b>Total N</b>: ",total_n,
                              "<br><b>Estimate</b>: ",est,
                              "<br><b>p value</b>: ",p),
-              showlegend = FALSE) %>% 
+              showlegend = FALSE) %>%
     add_annotations(text = ttext,
                     x = 0.5,
                     y = 1,
