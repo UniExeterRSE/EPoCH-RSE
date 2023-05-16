@@ -37,3 +37,37 @@ loaded_data <- observeEvent(input$load_results,{
   global_data$data_is_loaded = TRUE
   global_data$data <- loaded_data
 })
+
+observeEvent(input$exposure_choice,{
+  coeff_dat <- global_data$data$all_res
+  updateSelectizeInput(session, inputId = "coeff_person",
+                       choices = unique(coeff_dat$person_exposed),
+                       selected = unique(coeff_dat$person_exposed)[1])
+})
+
+observeEvent(input$coeff_person,{
+  coeff_dat <- global_data$data$all_res
+  updateSelectizeInput(session, inputId = "coeff_exptime",
+                       choices = unique(
+    coeff_dat$exposure_time[coeff_dat$exposure_class==tolower(input$exposure_choice)&
+                            coeff_dat$person_exposed==tolower(input$coeff_person)]),
+                       selected = unique(
+    coeff_dat$exposure_time[coeff_dat$exposure_class==tolower(input$exposure_choice)&
+                            coeff_dat$person_exposed==tolower(input$coeff_person)])[1]
+                            )
+})
+
+observeEvent(input$coeff_exptime,{
+  coeff_dat <- global_data$data$all_res
+  updateSelectizeInput(session, inputId = "coeff_explevel",
+                       choices = unique(
+    coeff_dat$exposure_linker[coeff_dat$exposure_class==tolower(input$exposure_choice)&
+                              coeff_dat$person_exposed==tolower(input$coeff_person)&
+                              coeff_dat$exposure_time==tolower(input$coeff_exptime)]
+                                       ),
+                       selected = unique(
+    coeff_dat$exposure_linker[coeff_dat$exposure_class==tolower(input$exposure_choice)&
+                              coeff_dat$person_exposed==tolower(input$coeff_person)&
+                              coeff_dat$exposure_time==tolower(input$coeff_exptime)])[1]
+                              )
+})

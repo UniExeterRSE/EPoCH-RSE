@@ -90,8 +90,34 @@ ui <- function(request) {
                                                         )
                                                   )
                                          ),
-                                tabPanel("Plot by exposure coefficient", icon = icon("chart-simple")),
-                                tabPanel("Forest plots", icon = icon("chart-simple")),
+                                tabPanel("Plot by exposure coefficient", icon = icon("chart-simple"),
+                                         selectizeInput(inputId = "coeff_person",
+                                                        label = tags$h4("Person exposed:"),
+                                                        choices = NULL,
+                                                        selected = NULL,
+                                                        multiple = T,
+                                                        options = list(placeholder = '----------', maxItems = 1)),
+                                         selectizeInput(inputId = "coeff_exptime",
+                                                        label = tags$h4("Exposure time:"),
+                                                        choices = NULL,
+                                                        selected = NULL,
+                                                        multiple = T,
+                                                        options = list(placeholder = '----------', maxItems = 1)),
+                                         selectizeInput(inputId = "coeff_explevel",
+                                                        label = tags$h4("Exposure level:"),
+                                                        choices = NULL,
+                                                        selected = NULL,
+                                                        multiple = T,
+                                                        options = list(placeholder = '----------', maxItems = 1)),
+                                         selectizeInput(inputId = "coeff_reporting",
+                                                        label = tags$h4("Reporting:"),
+                                                        choices = NULL,
+                                                        selected = NULL,
+                                                        multiple = T,
+                                                        options = list(placeholder = '----------', maxItems = 1))
+                                                        ),
+                                tabPanel("Forest plots", icon = icon("chart-simple"),
+                                         plotlyOutput("forestPlot")),
                                 tabPanel("Saved plots", icon = icon("save"))
                                     )
                             )
@@ -101,8 +127,7 @@ ui <- function(request) {
 
 server <- function(input, output, session) {
 
-  global_data <- reactiveValues(data = NULL, data_is_loaded = FALSE,
-                                active_models = NULL, active_exp = NULL)
+  global_data <- reactiveValues(data = NULL, data_is_loaded = FALSE)
 
   source("data_server.R",local=T)$value
   source("plot_server.R",local=T)$value
