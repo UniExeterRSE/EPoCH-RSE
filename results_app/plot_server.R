@@ -59,7 +59,7 @@ observeEvent(input$plot_data,{
     filtered_df <- create_exposure_dfs(tolower(input$exposure_choice),outc_df)
     p_m <- create_volcano_plot(filter(filtered_df, person_exposed=="mother"))
     p_f <- create_volcano_plot(filter(filtered_df, person_exposed=="father"))
-    subplot(p_m, p_f, shareY = TRUE, titleX = TRUE)%>%
+    fig <- subplot(p_m, p_f, shareY = TRUE, titleX = TRUE)%>%
       layout(xaxis = list(title = "Standardised effect estimate",
                          range = list(-0.75, 0.75)),
              yaxis = list(title = "Ranked -log10(P)"))
@@ -67,15 +67,24 @@ observeEvent(input$plot_data,{
 
   output$exposureCoeffPlot <- renderPlotly({
     model <- global_data$df_models$shortname[global_data$df_models$name == input$model_choice]
-    print(global_data$coeff_linkers)
-
     dat <- global_data$data$all_res[which(global_data$data$all_res$model==model),]
-    print(dat)
-    #print(dat$exposure_linker==tolower(global_data$coeff_linkers))
-    coeff_filtered <- dat[dat$exposure_linker==tolower(global_data$coeff_linkers),]
-    print(unique(coeff_filtered))
-    plot_df <- create_outcome_dfs(tolower(input$outcome_choice),coeff_filtered)
-    p_m <- create_coeff_plotly(plot_df)
+    plots <- list()
+    for (l in 1:length(global_data$coeff_linkers$linker)) {
+      coeff_filtered <- dat[dat$exposure_linker==tolower(global_data$coeff_linkers$linker[l]),]
+      plot_df <- create_outcome_dfs(tolower(input$outcome_choice),coeff_filtered)
+      plots[[l]] <- create_coeff_plotly(plot_df)
+    }
+    if (length(plots) == 1){
+      fig <- subplot(plots[[1]], shareY = TRUE, titleX = TRUE)
+    } else if (length(plots) == 2) {
+      fig <- subplot(plots[[1]], plots[[2]], shareY = TRUE, titleX = TRUE)
+    } else if (length(plots) == 3) {
+      fig <- subplot(plots[[1]], plots[[2]], plots[[3]], shareY = TRUE, titleX = TRUE)
+    } else if (length(plots) == 4) {
+      fig <- subplot(plots[[1]], plots[[2]], plots[[3]], plots[[4]], shareY = TRUE, titleX = TRUE)
+    }
+    fig <- fig %>% layout(xaxis = list(title = "Est"),
+                          yaxis = list(title = "Outcome"))
     })
 
   }

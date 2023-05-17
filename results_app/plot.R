@@ -88,8 +88,7 @@ create_coeff_plotly <- function(df){
                                "<br><b>Estimate</b>: ",est,
                                "<br><b>p value</b>: ",p),
               showlegend = FALSE) %>%
-    layout(xaxis = list(title = "Est"),
-           yaxis = list(title = "Outcome")) %>%
+    layout(xaxis = list(range = list(-1.85, 1.85))) %>%
     config(toImageButtonOptions = list(format = "png", scale = 5))
 }
 

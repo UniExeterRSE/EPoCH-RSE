@@ -93,13 +93,20 @@ observeEvent(input$add_comp,{
   coeff_filtered <- global_data$data$all_res[global_data$data$all_res$outcome_class==tolower(input$outcome_choice)&
                                              global_data$data$all_res$exposure_linker==tolower(input$coeff_explink),]
   if (length(global_data$data$all_res$outcome_linker[
-      global_data$data$all_res$outcome_class==tolower(input$outcome_choice)&
+        global_data$data$all_res$outcome_class==tolower(input$outcome_choice)&
         global_data$data$all_res$exposure_linker==tolower(input$coeff_explink)]) == 0) {
     showModal(modalDialog("No data available for this exposure linker"))
   } else {
-    global_data$coeff_linkers <- append(global_data$coeff_linkers, list("X",input$coeff_explink))
+    ldf_len = length(global_data$coeff_linkers$linker)
+    global_data$coeff_linkers$linker[ldf_len + 1] <- input$coeff_explink
   }
 })
+
+
+observeEvent(input$clear_comps,{
+    global_data$coeff_linkers <- NULL
+})
+
 
 output$showActiveLinkers <- renderTable({
   global_data$coeff_linkers

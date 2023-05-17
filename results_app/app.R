@@ -119,6 +119,7 @@ ui <- function(request) {
                                                            options = list(placeholder = '----------', maxItems = 1)),
                                             hr(),
                                             actionButton("add_comp","Add comparison"),
+                                            actionButton("clear_comps","Clear comparisons"),
                                             uiOutput("showActiveLinkers")),
                                         tabPanel("Plots", icon = icon("chart-simple"),
                                                  plotlyOutput("exposureCoeffPlot"))
@@ -136,7 +137,7 @@ ui <- function(request) {
 server <- function(input, output, session) {
 
   global_data <- reactiveValues(data = NULL, data_is_loaded = FALSE,
-                                coeff_linkers = list())
+                                coeff_linkers = NULL)
 
   source("data_server.R",local=T)$value
   source("plot_server.R",local=T)$value
