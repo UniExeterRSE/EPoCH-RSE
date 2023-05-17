@@ -74,7 +74,7 @@ create_manhattan_plot <- function(df, height, x_data, x_label){
 create_coeff_plotly <- function(df){
   adj_pthreshold <- 0.05/nrow(df)
   df %>%
-    plot_ly(height = 600, colors=graph_colours) %>% 
+    plot_ly(height = 20*length(df$outcome_linker)+50, colors=graph_colours) %>% 
     add_trace(x = ~est,y = ~outcome_linker, color = ~outcome_linker,
               type = "scatter", 
               hoverinfo = "text",

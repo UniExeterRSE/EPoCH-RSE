@@ -75,13 +75,13 @@ observeEvent(input$plot_data,{
       plots[[l]] <- create_coeff_plotly(plot_df)
     }
     if (length(plots) == 1){
-      fig <- subplot(plots[[1]], shareY = TRUE, titleX = TRUE)
+      fig <- subplot(plots[[1]], shareX = TRUE, shareY = TRUE, titleX = TRUE)
     } else if (length(plots) == 2) {
-      fig <- subplot(plots[[1]], plots[[2]], shareY = TRUE, titleX = TRUE)
+      fig <- subplot(plots[[1]], plots[[2]], shareX = TRUE, shareY = TRUE, titleX = TRUE)
     } else if (length(plots) == 3) {
-      fig <- subplot(plots[[1]], plots[[2]], plots[[3]], shareY = TRUE, titleX = TRUE)
+      fig <- subplot(plots[[1]], plots[[2]], plots[[3]], shareX = TRUE, shareY = TRUE, titleX = TRUE)
     } else if (length(plots) == 4) {
-      fig <- subplot(plots[[1]], plots[[2]], plots[[3]], plots[[4]], shareY = TRUE, titleX = TRUE)
+      fig <- subplot(plots[[1]], plots[[2]], plots[[3]], plots[[4]], shareX = TRUE, shareY = TRUE, titleX = TRUE)
     }
     fig <- fig %>% layout(xaxis = list(title = "Est"),
                           yaxis = list(title = "Outcome"))
