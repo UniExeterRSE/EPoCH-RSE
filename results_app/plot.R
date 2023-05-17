@@ -71,27 +71,25 @@ create_manhattan_plot <- function(df, height, x_data, x_label){
     config(toImageButtonOptions = list(format = "png", scale = 5))
 }
 
-create_exposure_box_plotly <- function(df){
+create_coeff_plotly <- function(df){
   adj_pthreshold <- 0.05/nrow(df)
   df %>%
     plot_ly(height = 600, colors=graph_colours) %>% 
-    add_trace(x = ~as.numeric(exposure_subclass_time_dose),y = ~-log10(p), color = ~exposure_subclass_time_dose,
-              type = "box", 
+    add_trace(x = ~est,y = ~outcome_linker, color = ~outcome_linker,
+              type = "scatter", 
               hoverinfo = "text",
+              error_x = list(type = "data",
+                             symmetric = TRUE,
+                             array = ~1.96*se),
               text = ~paste0("<b>Exposure class</b>: ",exposure_class,
-                               "<br><b>Exposure type</b>: ",exposure_subclass_time_dose,
                                "<br><b>Outcome class</b>: ",outcome_class,
-                               "<br><b>Outcome type</b>: ",outcome_subclass_time,
                                "<br><b>Cohorts</b>: ",cohorts,
                                "<br><b>Total N</b>: ",total_n,
                                "<br><b>Estimate</b>: ",est,
                                "<br><b>p value</b>: ",p),
               showlegend = FALSE) %>%
-    layout(shapes = list(hline(-log10(adj_pthreshold))),
-           xaxis = list(title = "Exposure type",
-                        ticktext = ~str_to_sentence(exposure_subclass_time_dose),
-                        tickvals = ~as.numeric(exposure_subclass_time_dose),
-                        tickmode = "array")) %>%
+    layout(xaxis = list(title = "Est"),
+           yaxis = list(title = "Outcome")) %>%
     config(toImageButtonOptions = list(format = "png", scale = 5))
 }
 
@@ -202,10 +200,10 @@ create_coef_plot_same_axis<- function(dat){
   
   xlab("Std Dev. Difference")+ylab("")+
     theme_minimal()+
-    theme(strip.text.y= element_blank(),
+    theme(strip.text.y = element_blank(),
           strip.text.x = element_text(colour = "white",size=10),
           panel.spacing = unit(0.1, "lines"),
-          panel.grid=element_blank(),
+          panel.grid = element_blank(),
           panel.background = element_rect(fill="grey90",colour="white"),
           strip.background = element_rect(fill="grey36",colour = "white"))
   
