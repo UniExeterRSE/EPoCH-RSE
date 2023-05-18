@@ -85,7 +85,7 @@ observeEvent(input$plot_data,{
     } else if (length(plots) == 4) {
       fig <- subplot(plots[[1]], plots[[2]], plots[[3]], plots[[4]], shareX = TRUE, shareY = TRUE, titleX = TRUE)
     }
-    print(paste(tolower(input$outcome_choice),"-"))
+
     fig <- fig %>% layout(xaxis = list(title = "Est"),
                           yaxis = list(title = paste("Outcome - ", input$outcome_choice),
                                      ticktext = str_to_sentence(sub(".","",gsub(tolower(input$outcome_choice),

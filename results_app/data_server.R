@@ -91,8 +91,6 @@ observeEvent(input$coeff_exptime,{
 
 observeEvent(input$add_comp,{
 
-  print(input$outcome_choice == "All")
-
   if (input$outcome_choice == "All") {
     showModal(modalDialog("Please select an outcome for comparison"))
   } else if (length(global_data$data$all_res$outcome_linker[
