@@ -37,3 +37,80 @@ loaded_data <- observeEvent(input$load_results,{
   global_data$data_is_loaded = TRUE
   global_data$data <- loaded_data
 })
+
+observeEvent(input$exposure_choice,{
+  coeff_dat <- global_data$data$all_res
+  updateSelectizeInput(session, inputId = "coeff_person",
+                       choices = list("Mother", "Father"),
+                       selected = "Select person exposed")
+})
+
+observeEvent(input$coeff_person,{
+  coeff_dat <- global_data$data$all_res
+  updateSelectizeInput(session, inputId = "coeff_subclass",
+                       choices = unique(str_to_sentence(
+    coeff_dat$exposure_subclass[coeff_dat$exposure_class==tolower(input$exposure_choice)&
+                                coeff_dat$person_exposed==tolower(input$coeff_person)]
+                                       )),
+                       selected = unique(str_to_sentence(
+    coeff_dat$exposure_subclass[coeff_dat$exposure_class==tolower(input$exposure_choice)&
+                                coeff_dat$person_exposed==tolower(input$coeff_person)]))[1]
+                              )
+})
+
+observeEvent(input$coeff_subclass,{
+  coeff_dat <- global_data$data$all_res
+  updateSelectizeInput(session, inputId = "coeff_exptime",
+                       choices = unique(str_to_sentence(
+    coeff_dat$exposure_time[coeff_dat$exposure_class==tolower(input$exposure_choice)&
+                            coeff_dat$person_exposed==tolower(input$coeff_person)&
+                            coeff_dat$exposure_subclass==tolower(input$coeff_subclass)])),
+                       selected = unique(str_to_sentence(
+    coeff_dat$exposure_time[coeff_dat$exposure_class==tolower(input$exposure_choice)&
+                            coeff_dat$person_exposed==tolower(input$coeff_person)&
+                            coeff_dat$exposure_subclass==tolower(input$coeff_subclass)]))[1]
+                            )
+})
+
+observeEvent(input$coeff_exptime,{
+  coeff_dat <- global_data$data$all_res
+  updateSelectizeInput(session, inputId = "coeff_explink",
+                       choices = unique(
+    coeff_dat$exposure_linker[coeff_dat$exposure_class==tolower(input$exposure_choice)&
+                              coeff_dat$person_exposed==tolower(input$coeff_person)&
+                              coeff_dat$exposure_subclass==tolower(input$coeff_subclass)&
+                              coeff_dat$exposure_time==tolower(input$coeff_exptime)]
+                                       ),
+                       selected = unique(
+    coeff_dat$exposure_linker[coeff_dat$exposure_class==tolower(input$exposure_choice)&
+                              coeff_dat$person_exposed==tolower(input$coeff_person)&
+                              coeff_dat$exposure_subclass==tolower(input$coeff_subclass)&
+                              coeff_dat$exposure_time==tolower(input$coeff_exptime)])[1]
+                              )
+})
+
+observeEvent(input$add_comp,{
+
+  if (input$outcome_choice == "All") {
+    showModal(modalDialog("Please select an outcome for comparison"))
+  } else if (length(global_data$data$all_res$outcome_linker[
+        global_data$data$all_res$outcome_class==tolower(input$outcome_choice)&
+        global_data$data$all_res$exposure_linker==tolower(input$coeff_explink)]) == 0) {
+    showModal(modalDialog("No data available for this exposure linker"))
+  } else if (length(global_data$coeff_linkers$Linker) == 4){
+    showModal(modalDialog("Maximum of 4 comparisons can be made"))
+  } else {
+    ldf_len = length(global_data$coeff_linkers$Linker)
+    global_data$coeff_linkers$Linker[ldf_len + 1] <- input$coeff_explink
+  }
+})
+
+
+observeEvent(input$clear_comps,{
+    global_data$coeff_linkers <- NULL
+})
+
+
+output$showActiveLinkers <- renderTable({
+  global_data$coeff_linkers
+})

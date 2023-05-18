@@ -50,6 +50,7 @@ ui <- function(request) {
                                        choices = NULL,
                                        selected = NULL,
                                        multiple = T,
+                                       width = "1200px",
                                        options = list(placeholder = '----------', maxItems = 1)),
                         selectizeInput(inputId = "model_choice",
                                        label = tags$h4("Model:"),
@@ -90,10 +91,43 @@ ui <- function(request) {
                                                         )
                                                   )
                                          ),
-                                tabPanel("Plot by exposure coefficient", icon = icon("chart-simple")),
-                                tabPanel("Forest plots", icon = icon("chart-simple")),
+                                tabPanel("Plot by exposure coefficient", icon = icon("chart-simple"),
+                                    tabsetPanel(
+                                        tabPanel("Select comparisons",
+                                            inputPanel(
+                                            selectizeInput(inputId = "coeff_person",
+                                                           label = tags$h4("Person exposed:"),
+                                                           choices = NULL,
+                                                           selected = NULL,
+                                                           options = list(placeholder = '----------', maxItems = 1)),
+                                            selectizeInput(inputId = "coeff_subclass",
+                                                           label = tags$h4("Exposure level:"),
+                                                           choices = NULL,
+                                                           selected = NULL,
+                                                           options = list(placeholder = '----------', maxItems = 1)),
+                                            selectizeInput(inputId = "coeff_exptime",
+                                                           label = tags$h4("Exposure time:"),
+                                                           choices = NULL,
+                                                           selected = NULL,
+                                                           options = list(placeholder = '----------', maxItems = 1))),
+                                            tags$div(
+                                            selectInput(width = "80%", inputId = "coeff_explink",
+                                                           label = tags$h4("Exposure linker:"),
+                                                           choices = NULL,
+                                                           selected = NULL,
+                                                           multiple = F)),
+                                            actionButton("add_comp","Add comparison"),
+                                            hr(),
+                                            uiOutput("showActiveLinkers"),
+                                            actionButton("clear_comps","Clear comparisons")),
+                                        tabPanel("Plots", icon = icon("chart-simple"),
+                                                 plotlyOutput("exposureCoeffPlot"))
+                                        )),
+                                tabPanel("Forest plots", icon = icon("chart-simple"),
+                                         plotlyOutput("forestPlot")),
                                 tabPanel("Saved plots", icon = icon("save"))
                                     )
+                                
                             )
                       )
 )
@@ -102,7 +136,7 @@ ui <- function(request) {
 server <- function(input, output, session) {
 
   global_data <- reactiveValues(data = NULL, data_is_loaded = FALSE,
-                                active_models = NULL, active_exp = NULL)
+                                coeff_linkers = NULL)
 
   source("data_server.R",local=T)$value
   source("plot_server.R",local=T)$value
