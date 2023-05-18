@@ -71,10 +71,10 @@ create_manhattan_plot <- function(df, height, x_data, x_label){
     config(toImageButtonOptions = list(format = "png", scale = 5))
 }
 
-create_coeff_plotly <- function(df){
+create_coeff_plotly <- function(df, title){
   adj_pthreshold <- 0.05/nrow(df)
   df %>%
-    plot_ly(height = 20*length(df$outcome_linker)+50, colors=graph_colours) %>% 
+    plot_ly(height = max(20*length(df$outcome_linker)+50, 300), colors=graph_colours) %>% 
     add_trace(x = ~est,y = ~outcome_linker, color = ~outcome_linker,
               type = "scatter", 
               hoverinfo = "text",
@@ -88,6 +88,11 @@ create_coeff_plotly <- function(df){
                                "<br><b>Estimate</b>: ",est,
                                "<br><b>p value</b>: ",p),
               showlegend = FALSE) %>%
+    add_annotations(text = str_to_sentence(title), font = list(size=10),
+                    x = 0, y = length(df$outcome_linker)+5,
+                    yref = "y", xref = "x",
+                    xanchor = "middle", yanchor = "top",
+                    showarrow = FALSE) %>%
     layout(xaxis = list(range = list(-1.85, 1.85))) %>%
     config(toImageButtonOptions = list(format = "png", scale = 5))
 }

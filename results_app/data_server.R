@@ -90,15 +90,20 @@ observeEvent(input$coeff_exptime,{
 })
 
 observeEvent(input$add_comp,{
-  coeff_filtered <- global_data$data$all_res[global_data$data$all_res$outcome_class==tolower(input$outcome_choice)&
-                                             global_data$data$all_res$exposure_linker==tolower(input$coeff_explink),]
-  if (length(global_data$data$all_res$outcome_linker[
+
+  print(input$outcome_choice == "All")
+
+  if (input$outcome_choice == "All") {
+    showModal(modalDialog("Please select an outcome for comparison"))
+  } else if (length(global_data$data$all_res$outcome_linker[
         global_data$data$all_res$outcome_class==tolower(input$outcome_choice)&
         global_data$data$all_res$exposure_linker==tolower(input$coeff_explink)]) == 0) {
     showModal(modalDialog("No data available for this exposure linker"))
+  } else if (length(global_data$coeff_linkers$Linker) == 4){
+    showModal(modalDialog("Maximum of 4 comparisons can be made"))
   } else {
-    ldf_len = length(global_data$coeff_linkers$linker)
-    global_data$coeff_linkers$linker[ldf_len + 1] <- input$coeff_explink
+    ldf_len = length(global_data$coeff_linkers$Linker)
+    global_data$coeff_linkers$Linker[ldf_len + 1] <- input$coeff_explink
   }
 })
 

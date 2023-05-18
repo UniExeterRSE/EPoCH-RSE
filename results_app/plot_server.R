@@ -69,10 +69,12 @@ observeEvent(input$plot_data,{
     model <- global_data$df_models$shortname[global_data$df_models$name == input$model_choice]
     dat <- global_data$data$all_res[which(global_data$data$all_res$model==model),]
     plots <- list()
-    for (l in 1:length(global_data$coeff_linkers$linker)) {
-      coeff_filtered <- dat[dat$exposure_linker==tolower(global_data$coeff_linkers$linker[l]),]
+    for (l in 1:length(global_data$coeff_linkers$Linker)) {
+      coeff_filtered <- dat[dat$exposure_linker==tolower(global_data$coeff_linkers$Linker[l]),]
       plot_df <- create_outcome_dfs(tolower(input$outcome_choice),coeff_filtered)
-      plots[[l]] <- create_coeff_plotly(plot_df)
+      plot_title <- str_replace(global_data$coeff_linkers$Linker[l], "self-reported", "self reported")
+      plot_title <- str_replace_all(plot_title, "-", "\n")
+      plots[[l]] <- create_coeff_plotly(plot_df, plot_title)
     }
     if (length(plots) == 1){
       fig <- subplot(plots[[1]], shareX = TRUE, shareY = TRUE, titleX = TRUE)
@@ -83,8 +85,13 @@ observeEvent(input$plot_data,{
     } else if (length(plots) == 4) {
       fig <- subplot(plots[[1]], plots[[2]], plots[[3]], plots[[4]], shareX = TRUE, shareY = TRUE, titleX = TRUE)
     }
+    print(paste(tolower(input$outcome_choice),"-"))
     fig <- fig %>% layout(xaxis = list(title = "Est"),
-                          yaxis = list(title = "Outcome"))
+                          yaxis = list(title = paste("Outcome - ", input$outcome_choice),
+                                     ticktext = str_to_sentence(sub(".","",gsub(tolower(input$outcome_choice),
+                                                                "",unique(plot_df$outcome_linker)))),
+                                     tickvals = as.numeric(unique(as.factor(plot_df$outcome_linker)))-1,
+                                     tickmode = "array"))
     })
 
   }
