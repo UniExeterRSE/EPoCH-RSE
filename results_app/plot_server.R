@@ -1,7 +1,5 @@
 source("plot.R")
 
-suppressWarnings({
-
 ## When the user clicks "visualise results"...
 observeEvent(input$plot_data,{
   ## If the data hasn't been loaded, they get an error message...
@@ -76,7 +74,7 @@ observeEvent(input$plot_data,{
     for (l in 1:length(global_data$coeff_linkers$Linker)){
       coeff_filtered <- dat[dat$exposure_linker==tolower(global_data$coeff_linkers$Linker[l]),]
       plot_df <- create_outcome_dfs(tolower(input$outcome_choice),coeff_filtered)
-      y_data <- unique(c(y_data, plot_df$outcome_linker))
+      y_data <- sort(unique(c(y_data, plot_df$outcome_linker)))
     }
 
     for (l in 1:length(global_data$coeff_linkers$Linker)) {
@@ -101,12 +99,19 @@ observeEvent(input$plot_data,{
                                        showline = FALSE,
                                        ticktext = str_to_sentence(sub(".","",gsub(tolower(input$outcome_choice),
                                                                    "",y_data))),
-                                       tickvals = as.numeric(as.factor(y_data)),
+                                       tickvals = seq.int(1,length(y_data)),
                                        tickmode = "array"))
     })
 
-  }
+  output$forestPlot <- renderPlotly({
+    model <- global_data$df_models$shortname[global_data$df_models$name == input$model_choice]
+    dat <- global_data$data$all_res[which(global_data$data$all_res$model==model),]
+    print(colnames(dat))
+    cohorts <- grep(",", unique(dat$cohorts), invert = TRUE, value = TRUE)
+    plot <- create_forest_plot(dat)
 
-})
+    })
+
+  }
 
 })
