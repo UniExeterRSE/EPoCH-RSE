@@ -114,9 +114,8 @@ create_volcano_plot <- function(df){
 }
 
 
-create_coeff_plotly <- function(df, ydat, title){
-  adj_pthreshold <- 0.05/nrow(df)
-
+create_coeff_plot <- function(df, ydat, title){
+  
   if("binary" %in% df$outcome_type){
     df[,grep(colnames(df),pattern="est|ucl|lcl")] <- exp(df[,grep(colnames(df),pattern="est|ucl|lcl")])
     xtitle <- "Odds Ratio"
@@ -156,35 +155,41 @@ create_coeff_plotly <- function(df, ydat, title){
 }
 
 create_forest_plot <- function(df){
-  adj_pthreshold <- 0.05/nrow(df)
 
   if("binary" %in% df$outcome_type){
     df[,grep(colnames(df),pattern="est|ucl|lcl")] <- exp(df[,grep(colnames(df),pattern="est|ucl|lcl")])
     xtitle <- "Odds Ratio"
     x_origin = 1
-    x_range = 2.45
+    x_range = list(-0.25, 3.5)
   } else {
     xtitle <- "Std Dev. Difference"
     x_origin = 0
-    x_range = 1.85
+    x_range = list(-1.85, 1.85)
   }
 
   df %>%
-    plot_ly() %>% 
-    add_trace(x = ~est_ALSPAC,y = 1, color = ~outcome_linker,
-              type = "box", 
+    plot_ly(height = max(20*length(ydat)+50, 300)) %>% 
+    add_trace(x = ~est,y = ~cohorts, color = ~outcome_linker,
+              type = "scatter", 
               hoverinfo = "text",
-              #text = ~paste0("<b>Exposure class</b>: ",exposure_class,
-              #                 "<br><b>Outcome class</b>: ",outcome_class,
-              #                 "<br><b>Outcome linker</b>: ",outcome_linker,
-              #                 "<br><b>Cohorts</b>: ",cohorts,
-              #                 "<br><b>Total N</b>: ",total_n,
-              #                 "<br><b>Estimate</b>: ",est,
-              #                 "<br><b>p value</b>: ",p),
+              error_x = list(type = "data",
+                             symmetric = TRUE,
+                             array = ~1.96*se),
+              text = ~paste0("<b>Exposure class</b>: ",exposure_class,
+                               "<br><b>Outcome class</b>: ",outcome_class,
+                               "<br><b>Cohorts</b>: ",cohorts,
+                               "<br><b>Total N</b>: ",total_n,
+                               "<br><b>Estimate</b>: ",est,
+                               "<br><b>p value</b>: ",p),
               showlegend = FALSE) %>%
+    add_annotations(text = str_to_sentence(title), font = list(size=10),
+                    x = x_origin+(mean(unlist(x_range))/2), y = length(ydat)+6.5,
+                    yref = "y", xref = "x",
+                    xanchor = "middle", yanchor = "top",
+                    showarrow = FALSE) %>%
 
     layout(shapes = list(vline(x_origin)),
            xaxis = list(title = xtitle,
-                        range = list(x_origin-x_range, x_origin+x_range))) %>%
+                        range = x_range)) %>%
     config(toImageButtonOptions = list(format = "png", scale = 5))
 }

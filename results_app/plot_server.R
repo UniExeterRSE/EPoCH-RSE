@@ -82,7 +82,7 @@ observeEvent(input$plot_data,{
       plot_df <- create_outcome_dfs(tolower(input$outcome_choice),coeff_filtered)
       plot_title <- str_replace(global_data$coeff_linkers$Linker[l], "self-reported", "self reported")
       plot_title <- str_replace_all(plot_title, "-", "\n")
-      plots[[l]] <- create_coeff_plotly(plot_df, y_data, plot_title)
+      plots[[l]] <- create_coeff_plot(plot_df, y_data, plot_title)
     }
 
     if (length(plots) == 1){

@@ -38,6 +38,7 @@ loaded_data <- observeEvent(input$load_results,{
   global_data$data <- loaded_data
 })
 
+# Coefficient plot data organisation
 observeEvent(input$exposure_choice,{
   coeff_dat <- global_data$data$all_res
   updateSelectizeInput(session, inputId = "coeff_person",
@@ -110,4 +111,88 @@ observeEvent(input$clear_comps,{
 
 output$showActiveLinkers <- renderTable({
   global_data$coeff_linkers
+})
+
+# Forest plot data organisation
+observeEvent(input$exposure_choice,{
+  coeff_dat <- global_data$data$all_res
+  updateSelectizeInput(session, inputId = "forest_person",
+                       choices = list("Mother", "Father"),
+                       selected = "Select person exposed")
+  updateSelectizeInput(session, inputId = "coeff_subclass",
+                       choices = list('----------'),selected = '----------')
+  updateSelectizeInput(inputId = "coeff_exptime",
+                       choices = list('----------'),selected = '----------')
+})
+
+observeEvent(input$forest_person,{
+  forest_dat <- global_data$data$all_res
+  updateSelectizeInput(session, inputId = "forest_subclass",
+                       choices = unique(str_to_sentence(
+    forest_dat$exposure_subclass[forest_dat$exposure_class==tolower(input$exposure_choice)&
+                                forest_dat$person_exposed==tolower(input$forest_person)]
+                                       )),
+                       selected = '----------')
+})
+
+observeEvent(input$forest_subclass,{
+  forest_dat <- global_data$data$all_res
+  updateSelectizeInput(session, inputId = "forest_exptime",
+                       choices = unique(str_to_sentence(
+    forest_dat$exposure_time[forest_dat$exposure_class==tolower(input$exposure_choice)&
+                            forest_dat$person_exposed==tolower(input$forest_person)&
+                            forest_dat$exposure_subclass==tolower(input$forest_subclass)])),
+                       selected = '----------')
+})
+
+observeEvent(input$outcome_choice,{
+  forest_dat <- global_data$data$all_res
+  updateSelectizeInput(session, inputId = "forest_outcometype",
+                       choices = unique(str_to_sentence(
+    forest_dat$outcome_subclass1[forest_dat$exposure_class==tolower(input$exposure_choice)&
+                                 forest_dat$person_exposed==tolower(input$forest_person)&
+                                 forest_dat$exposure_subclass==tolower(input$forest_subclass)&
+                                 forest_dat$exposure_time==tolower(input$forest_exptime)&
+                                 forest_dat$outcome_class==tolower(input$outcome_choice)]
+                                       ),
+                       selected = '----------')
+                              )
+})
+
+observeEvent(input$forest_exptime,{
+  forest_dat <- global_data$data$all_res
+  updateSelectizeInput(session, inputId = "forest_explink",
+                       choices = unique(
+    forest_dat$exposure_linker[forest_dat$exposure_class==tolower(input$exposure_choice)&
+                              forest_dat$person_exposed==tolower(input$forest_person)&
+                              forest_dat$exposure_subclass==tolower(input$forest_subclass)&
+                              forest_dat$exposure_time==tolower(input$forest_exptime)]
+                                       ),
+                       selected = unique(
+    forest_dat$exposure_linker[forest_dat$exposure_class==tolower(input$exposure_choice)&
+                              forest_dat$person_exposed==tolower(input$forest_person)&
+                              forest_dat$exposure_subclass==tolower(input$forest_subclass)&
+                              forest_dat$exposure_time==tolower(input$forest_exptime)])[1]
+                              )
+})
+
+observeEvent(input$forest_outcometype,{
+  forest_dat <- global_data$data$all_res
+  updateSelectizeInput(session, inputId = "forest_outlink",
+                       choices = unique(
+    forest_dat$outcome_linker[forest_dat$exposure_class==tolower(input$exposure_choice)&
+                                 forest_dat$person_exposed==tolower(input$forest_person)&
+                                 forest_dat$exposure_subclass==tolower(input$forest_subclass)&
+                                 forest_dat$exposure_time==tolower(input$forest_exptime)&
+                                 forest_dat$outcome_class==tolower(input$outcome_choice)&
+                                 forest_dat$outcome_subclass1==tolower(input$forest_outcometype)]
+                                       ),
+                       selected = unique(
+    forest_dat$outcome_linker[forest_dat$exposure_class==tolower(input$exposure_choice)&
+                                 forest_dat$person_exposed==tolower(input$forest_person)&
+                                 forest_dat$exposure_subclass==tolower(input$forest_subclass)&
+                                 forest_dat$exposure_time==tolower(input$forest_exptime)&
+                                 forest_dat$outcome_class==tolower(input$outcome_choice)&
+                                 forest_dat$outcome_subclass1==tolower(input$forest_outcometype)])[1]
+                              )
 })
