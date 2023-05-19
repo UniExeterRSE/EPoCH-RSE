@@ -17,6 +17,13 @@ hline <- function(y = 0, colour = "#898989") {
   )
 }
 
+vline <- function(x = 0, colour = "#898989") {
+  list(type = "line", x0 = x, x1 = x,
+       xref = "paper", y0 = 0, y1 = 1,
+       line = list(color = colour, dash="dash")
+  )
+}
+
 plot_df_manhattan <- function(fig, df, x_data, label){
   fig <- fig %>%
     add_markers(name = label, x = jitter(as.numeric(as.factor(df[[x_data]])), amount=0.3), y =-log10(df$p),
@@ -71,32 +78,6 @@ create_manhattan_plot <- function(df, height, x_data, x_label){
     config(toImageButtonOptions = list(format = "png", scale = 5))
 }
 
-create_coeff_plotly <- function(df, title){
-  adj_pthreshold <- 0.05/nrow(df)
-  df %>%
-    plot_ly(height = max(20*length(df$outcome_linker)+50, 300), colors=graph_colours) %>% 
-    add_trace(x = ~est,y = ~outcome_linker, color = ~outcome_linker,
-              type = "scatter", 
-              hoverinfo = "text",
-              error_x = list(type = "data",
-                             symmetric = TRUE,
-                             array = ~1.96*se),
-              text = ~paste0("<b>Exposure class</b>: ",exposure_class,
-                               "<br><b>Outcome class</b>: ",outcome_class,
-                               "<br><b>Cohorts</b>: ",cohorts,
-                               "<br><b>Total N</b>: ",total_n,
-                               "<br><b>Estimate</b>: ",est,
-                               "<br><b>p value</b>: ",p),
-              showlegend = FALSE) %>%
-    add_annotations(text = str_to_sentence(title), font = list(size=10),
-                    x = 0, y = length(df$outcome_linker)+5,
-                    yref = "y", xref = "x",
-                    xanchor = "middle", yanchor = "top",
-                    showarrow = FALSE) %>%
-    layout(xaxis = list(range = list(-1.85, 1.85))) %>%
-    config(toImageButtonOptions = list(format = "png", scale = 5))
-}
-
 create_volcano_plot <- function(df){
   pthreshold_rank <- rank(-log10(df$p))[which.min(abs(df$p-0.05))]-1
   adj_pthreshold <- 0.05/nrow(df)
@@ -133,88 +114,46 @@ create_volcano_plot <- function(df){
 }
 
 
-#######################
-# Coef plot functions #
-#######################
+create_coeff_plotly <- function(df, ydat, title){
+  adj_pthreshold <- 0.05/nrow(df)
 
-
-create_coef_plot_faceted<- function(dat){
-  
-  dat <- dat[order(dat$comparison,dat$est),]
-  dat$outcome_text <- unlist(lapply(strsplit(dat$outcome_linker,split="-"),function(x) paste(x[3:4],collapse = " - ")))
-  substr(dat$outcome_text,1,1) <- toupper(substr(dat$outcome_text,1,1))
-  dat$outcome_text <- factor(dat$outcome_text,ordered=T,levels=unique(dat$outcome_text))
-  
-  dat$lcl <- dat$est-(1.96 * dat$se)
-  dat$ucl <- dat$est+(1.96 * dat$se)
-  
-  intercept_n <- 0
-  
-  if("binary" %in% dat$outcome_type){
-    dat[,grep(colnames(dat),pattern="est|ucl|lcl")] <- exp(dat[,grep(colnames(dat),pattern="est|ucl|lcl")])
-    intercept_n <- 1
+  if("binary" %in% df$outcome_type){
+    df[,grep(colnames(df),pattern="est|ucl|lcl")] <- exp(df[,grep(colnames(df),pattern="est|ucl|lcl")])
+    xtitle <- "Odds Ratio"
+    x_origin = 1
+    x_range = 2.45
+  } else {
+    xtitle <- "Std Dev. Difference"
+    x_origin = 0
+    x_range = 1.85
   }
-  
-  coef_plot <- ggplot(dat,aes(x=est,y=outcome_text,xmin=lcl,xmax=ucl))+
-    geom_vline(xintercept = intercept_n,colour="grey36")+
-    geom_pointrange()+
-    facet_grid(outcome_text~comparison,scales="free",space="free_y")+
-    
-    xlab("Std Dev. Difference")+ylab("")+
-    theme_minimal()+
-    theme(strip.text.y= element_text(colour=NA,size=0),
-          strip.text.x = element_text(colour = "white",size=10),
-          panel.spacing = unit(0.1, "lines"),
-          panel.grid=element_blank(),
-          panel.background = element_rect(fill="grey90",colour="white"),
-          strip.background = element_rect(fill="grey36",colour = "white"))
-  
-  
-  if("binary" %in% dat$outcome_type){
-    coef_plot <- coef_plot + xlab("Odds Ratio")
-  }
-  
-  ggplotly(coef_plot)
-}
 
+  x_range = 1.85
 
- 
+  df %>%
+    plot_ly(height = max(20*length(df$outcome_linker)+50, 300)) %>% 
+    add_trace(x = ~est,y = match(df$outcome_linker, ydat), color = ~outcome_linker,
+              type = "scatter", 
+              hoverinfo = "text",
+              error_x = list(type = "data",
+                             symmetric = TRUE,
+                             array = ~1.96*se),
+              text = ~paste0("<b>Exposure class</b>: ",exposure_class,
+                               "<br><b>Outcome class</b>: ",outcome_class,
+                               "<br><b>Outcome linker</b>: ",outcome_linker,
+                               "<br><b>Cohorts</b>: ",cohorts,
+                               "<br><b>Total N</b>: ",total_n,
+                               "<br><b>Estimate</b>: ",est,
+                               "<br><b>p value</b>: ",p),
+              showlegend = FALSE) %>%
+    add_annotations(text = str_to_sentence(title), font = list(size=10),
+                    x = x_origin, y = length(ydat)+6.5,
+                    yref = "y", xref = "x",
+                    xanchor = "middle", yanchor = "top",
+                    showarrow = FALSE) %>%
 
-create_coef_plot_same_axis<- function(dat){
-  
-  dat <- dat[order(dat$comparison,dat$est),]
-  dat$outcome_text <- unlist(lapply(strsplit(dat$outcome_linker,split="-"),function(x) paste(x[3:4],collapse = " - ")))
-  substr(dat$outcome_text,1,1) <- toupper(substr(dat$outcome_text,1,1))
-  dat$outcome_text <- factor(dat$outcome_text,ordered=T,levels=unique(dat$outcome_text))
-  
-  dat$lcl <- dat$est-(1.96 * dat$se)
-  dat$ucl <- dat$est+(1.96 * dat$se)
-  
-  intercept_n <- 0
-  
-  if("binary" %in% dat$outcome_type){
-    dat[,grep(colnames(dat),pattern="est|ucl|lcl")] <- exp(dat[,grep(colnames(dat),pattern="est|ucl|lcl")])
-    intercept_n <- 1
-  }
-  
-  coef_plot <- ggplot(dat,aes(x=est,y=outcome_text,xmin=lcl,xmax=ucl))+
-    geom_vline(xintercept = intercept_n,colour="grey36")+
-    geom_pointrange(aes(shape=comparison,colour=comparison),position = position_dodge(1))+
-    facet_grid(outcome_text~.,scales="free",space="free_y")+
-  
-  xlab("Std Dev. Difference")+ylab("")+
-    theme_minimal()+
-    theme(strip.text.y = element_blank(),
-          strip.text.x = element_text(colour = "white",size=10),
-          panel.spacing = unit(0.1, "lines"),
-          panel.grid = element_blank(),
-          panel.background = element_rect(fill="grey90",colour="white"),
-          strip.background = element_rect(fill="grey36",colour = "white"))
-  
-  
-  if("binary" %in% dat$outcome_type){
-    coef_plot <- coef_plot + xlab("Odds Ratio")
-  }
-  
-  ggplotly(coef_plot)
+    layout(shapes = list(vline(x_origin)),
+           xaxis = list(title = xtitle,
+                        range = list(x_origin-x_range, x_origin+x_range))) %>%
+    config(toImageButtonOptions = list(format = "png", scale = 5))
 }

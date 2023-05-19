@@ -43,6 +43,10 @@ observeEvent(input$exposure_choice,{
   updateSelectizeInput(session, inputId = "coeff_person",
                        choices = list("Mother", "Father"),
                        selected = "Select person exposed")
+  updateSelectizeInput(session, inputId = "coeff_subclass",
+                       choices = list('----------'),selected = '----------')
+  updateSelectizeInput(inputId = "coeff_exptime",
+                       choices = list('----------'),selected = '----------')
 })
 
 observeEvent(input$coeff_person,{
@@ -52,10 +56,7 @@ observeEvent(input$coeff_person,{
     coeff_dat$exposure_subclass[coeff_dat$exposure_class==tolower(input$exposure_choice)&
                                 coeff_dat$person_exposed==tolower(input$coeff_person)]
                                        )),
-                       selected = unique(str_to_sentence(
-    coeff_dat$exposure_subclass[coeff_dat$exposure_class==tolower(input$exposure_choice)&
-                                coeff_dat$person_exposed==tolower(input$coeff_person)]))[1]
-                              )
+                       selected = '----------')
 })
 
 observeEvent(input$coeff_subclass,{
@@ -65,11 +66,7 @@ observeEvent(input$coeff_subclass,{
     coeff_dat$exposure_time[coeff_dat$exposure_class==tolower(input$exposure_choice)&
                             coeff_dat$person_exposed==tolower(input$coeff_person)&
                             coeff_dat$exposure_subclass==tolower(input$coeff_subclass)])),
-                       selected = unique(str_to_sentence(
-    coeff_dat$exposure_time[coeff_dat$exposure_class==tolower(input$exposure_choice)&
-                            coeff_dat$person_exposed==tolower(input$coeff_person)&
-                            coeff_dat$exposure_subclass==tolower(input$coeff_subclass)]))[1]
-                            )
+                       selected = '----------')
 })
 
 observeEvent(input$coeff_exptime,{
