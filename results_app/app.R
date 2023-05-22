@@ -146,7 +146,7 @@ ui <- function(request) {
                                                            choices = NULL,
                                                            selected = NULL,
                                                            options = list(placeholder = '----------', maxItems = 1))
-                                                           )),
+                                                           ),
                                             tags$div(
                                             selectInput(width = "80%", inputId = "forest_explink",
                                                            label = tags$h4("Exposure linker:"),
@@ -157,9 +157,11 @@ ui <- function(request) {
                                                            label = tags$h4("Outcome linker:"),
                                                            choices = NULL,
                                                            selected = NULL,
-                                                           multiple = F))
-                                            ),
-                                tabPanel("Saved plots", icon = icon("save"))
+                                                           multiple = F))),
+                                            tabPanel("Plots", icon = icon("chart-simple"),plotlyOutput("forestPlot"),
+                                                     hr(),
+                                                     uiOutput("showForestLinkers")),
+                                            )
                                     )
                                 )
                             )

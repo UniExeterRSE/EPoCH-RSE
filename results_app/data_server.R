@@ -196,3 +196,10 @@ observeEvent(input$forest_outcometype,{
                                  forest_dat$outcome_subclass1==tolower(input$forest_outcometype)])[1]
                               )
 })
+
+output$showForestLinkers <- renderTable({
+  forest_tab <- data.frame(Kind=c("Exposure", "Outcome"),
+                           Linker=c(input$forest_explink, input$forest_outlink))
+  print(forest_tab)
+  forest_tab
+})

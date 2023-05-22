@@ -106,9 +106,11 @@ observeEvent(input$plot_data,{
   output$forestPlot <- renderPlotly({
     model <- global_data$df_models$shortname[global_data$df_models$name == input$model_choice]
     dat <- global_data$data$all_res[which(global_data$data$all_res$model==model),]
-    print(colnames(dat))
-    cohorts <- grep(",", unique(dat$cohorts), invert = TRUE, value = TRUE)
-    plot <- create_forest_plot(dat)
+    forest_df <- create_forest_dfs(dat, input$forest_explink, input$forest_outlink)
+    #print(colnames(dat))
+    #cohorts <- grep(",", unique(dat$cohorts), invert = TRUE, value = TRUE)
+    #plot <- create_forest_plot(forest_df, cohorts)
+    create_forest_plot(forest_df)
 
     })
 
