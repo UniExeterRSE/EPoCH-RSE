@@ -124,10 +124,46 @@ ui <- function(request) {
                                                  plotlyOutput("exposureCoeffPlot"))
                                         )),
                                 tabPanel("Forest plots", icon = icon("chart-simple"),
-                                         plotlyOutput("forestPlot")),
-                                tabPanel("Saved plots", icon = icon("save"))
+                                    tabsetPanel(
+                                        tabPanel("Select comparisons",
+                                            inputPanel(selectizeInput(inputId = "forest_person",
+                                                           label = tags$h4("Person exposed:"),
+                                                           choices = NULL,
+                                                           selected = NULL,
+                                                           options = list(placeholder = '----------', maxItems = 1)),
+                                            selectizeInput(inputId = "forest_subclass",
+                                                           label = tags$h4("Exposure level:"),
+                                                           choices = NULL,
+                                                           selected = NULL,
+                                                           options = list(placeholder = '----------', maxItems = 1)),
+                                            selectizeInput(inputId = "forest_exptime",
+                                                           label = tags$h4("Exposure time:"),
+                                                           choices = NULL,
+                                                           selected = NULL,
+                                                           options = list(placeholder = '----------', maxItems = 1)),
+                                            selectizeInput(inputId = "forest_outcometype",
+                                                           label = tags$h4("Outcome type:"),
+                                                           choices = NULL,
+                                                           selected = NULL,
+                                                           options = list(placeholder = '----------', maxItems = 1))
+                                                           ),
+                                            tags$div(
+                                            selectInput(width = "80%", inputId = "forest_explink",
+                                                           label = tags$h4("Exposure linker:"),
+                                                           choices = NULL,
+                                                           selected = NULL,
+                                                           multiple = F),
+                                            selectInput(width = "80%", inputId = "forest_outlink",
+                                                           label = tags$h4("Outcome linker:"),
+                                                           choices = NULL,
+                                                           selected = NULL,
+                                                           multiple = F))),
+                                            tabPanel("Plots", icon = icon("chart-simple"),plotlyOutput("forestPlot"),
+                                                     hr(),
+                                                     uiOutput("showForestLinkers")),
+                                            )
                                     )
-                                
+                                )
                             )
                       )
 )

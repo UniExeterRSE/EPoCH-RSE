@@ -84,3 +84,59 @@ create_outcome_dfs <- function(outcomeclass, dat){
   df$se_SDM[df$outcome_type=="binary"|df$outcome_type=="ordinal"]<-df$se[df$outcome_type=="binary"|df$outcome_type=="ordinal"]*0.5513
   df
 }
+
+create_exposure_dfs <- function(exposureclass, dat){
+
+  if (exposureclass == "all") {
+    df <- dat[dat$person_exposed!="child",]
+  } else {
+    df <- dat[dat$exposure_class==exposureclass&dat$person_exposed!="child",]
+  }
+
+  df$exposure_dose_ordered <- factor(df$exposure_dose,ordered=T,levels=c("light","moderate","heavy"))
+  df <- df[order(df$exposure_subclass,df$exposure_time,df$exposure_dose_ordered),]
+  df$exposure_subclass_time_dose <- paste(df$exposure_subclass,df$exposure_time,df$exposure_dose)
+  df$exposure_subclass_time_dose<-factor(df$exposure_subclass_time_dose,ordered=T,levels=unique(df$exposure_subclass_time_dose))
+  # to convert ln(OR) to cohen's d (SDM), multiply ln(OR) by sqrt(3)/pi (which is 0.5513)
+  # to convert SDM to ln(OR), multiply SDM by pi/sqrt(3) (which is 1.814)
+  # https://www.meta-analysis.com/downloads/Meta-analysis%20Converting%20among%20effect%20sizes.pdf
+  # https://onlinelibrary.wiley.com/doi/abs/10.1002/1097-0258(20001130)19:22%3C3127::AID-SIM784%3E3.0.CO;2-M
+  df$est_SDM <- df$est
+  df$est_SDM[df$outcome_type=="binary"|df$outcome_type=="ordinal"]<-df$est[df$outcome_type=="binary"|df$outcome_type=="ordinal"]*0.5513
+  df$se_SDM <- df$se
+  df$se_SDM[df$outcome_type=="binary"|df$outcome_type=="ordinal"]<-df$se[df$outcome_type=="binary"|df$outcome_type=="ordinal"]*0.5513
+  df
+}
+
+create_forest_dfs <- function(dat, exp_linker, out_linker){
+  extracted_res <- dat[which(dat$exposure_linker==exp_linker &
+                             dat$outcome_linker==out_linker),]
+
+  # which cohorts contributed to the meta-analysis 
+  cohorts <- unlist(strsplit(extracted_res$cohorts,split=","))
+  cohorts <-str_remove(cohorts," ")
+
+  #prepare data:
+  df <- data.frame(exposure=rep(extracted_res$exposure_linker, length(cohorts)+1),
+                   outcome=rep(extracted_res$outcome_linker, length(cohorts)+1),
+                   cohort=c("meta",cohorts),
+                   binary=c(extracted_res$outcome_type=="binary"),
+                   est=c(extracted_res$est,#meta-analysis estimate
+                         unlist(extracted_res[,paste0("est_",cohorts)])), #estimates for each cohort
+                   se=c(extracted_res$se,#meta-analysis standard errror
+                         unlist(extracted_res[,paste0("se_",cohorts)])), #standard errors for each cohort
+                   n=c(extracted_res$total_n,#meta-analysis sample size
+                        unlist(extracted_res[,paste0("n_",cohorts)])), #sample size for each cohort
+                   P=c(extracted_res$p,#meta-analysis P-value
+                       unlist(extracted_res[,paste0("p_",cohorts)])) #P-value for each cohort
+                   )
+  df$lci <- df$est-(1.96*df$se) #lower 95% CI
+  df$uci <- df$est+(1.96*df$se) #upper 95% CI
+
+  df$cohort<-factor(df$cohort,ordered=T,levels=c("meta",sort(cohorts,decreasing = T))) #ordering so that meta-analysis statistic comes bottom
+  df$point_size <- c(1, #size 1 for meta-analysis results
+                     sqrt(sqrt(1/df$se[-1]/100)) #then all other cohorts will have points sized smaller than 1, but proportionate to their contribution to the meta-analysis (i.e. the inverse of the variance)
+  
+  )
+  df
+}
