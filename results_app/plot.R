@@ -140,14 +140,13 @@ create_coeff_plot <- function(df, ydat, title) {
                                "<br><b>p value</b>: ",p),
               showlegend = FALSE) %>%
     add_annotations(text = str_to_sentence(title), font = list(size=10),
-                    x = x_origin+(mean(unlist(x_range))/2), y = length(ydat)+6.5,
+                    x = x_origin, y = length(ydat)+6.5,
                     yref = "y", xref = "x",
                     xanchor = "middle", yanchor = "top",
                     showarrow = FALSE) %>%
 
     layout(shapes = list(vline(x_origin)),
-           xaxis = list(title = xtitle,
-                        range = x_range)) %>%
+           xaxis = list(title = xtitle)) %>%
     config(toImageButtonOptions = list(format = "png", scale = 5))
 }
 
