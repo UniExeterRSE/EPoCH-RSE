@@ -2,11 +2,10 @@
 # Load required packages -------------------------------
 library(shiny)
 library(shinyjs)
+library(shinycssloaders)
+library(shinyTree)
 library(tidyverse)
 library(plotly)
-library(shinycssloaders)
-library(shinyjs)
-library(shinyTree)
 library(bslib)
 
 source("data.R")
