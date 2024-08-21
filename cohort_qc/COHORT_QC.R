@@ -21,7 +21,7 @@ library(stringr)
 
 # Set locations of scripts, data and save files
 
-models <- c(paste0("model",as.vector(outer(1:4, letters[1:3], paste0))))
+models <- c(paste0("model",as.vector(outer(1:4, letters[1:2], paste0))))
 
 cohort_name <- cohort
 
