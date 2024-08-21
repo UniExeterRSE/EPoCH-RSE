@@ -68,7 +68,7 @@ print("combining all model results in long format...")
 all_models_phewas_long <- bind_rows(cohort_phewas)
 
 # remove model c
-all_models_phewas_long <- all_models_phewas_long[-grep("1c|2c|3c|4c",all_models_phewas_long$model),]
+#all_models_phewas_long <- all_models_phewas_long[-grep("1c|2c|3c|4c",all_models_phewas_long$model),]
 
 print("initial number of results (without model c):")
 print(nrow(all_models_phewas_long))
